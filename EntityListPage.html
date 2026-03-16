@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Portal — Entity List</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── IES / IDS Design Tokens ─────────────────────────────────────────── */
+    :root {
+      /* IES Brand colors */
+      --ies-navy:       #00254a;   /* primary action, topbar */
+      --ies-navy-hover: #001d3c;
+      --ies-teal:       #00b797;   /* spearmint-60, accents */
+      --ies-teal-light: #ecfff7;
+      --ies-link:       #205ea3;   /* IES link blue */
+      --ies-link-hover: #17497f;
+
+      /* Semantic */
+      --color-text-primary:   #0d233a;
+      --color-text-secondary: #405161;
+      --color-text-tertiary:  #607280;
+      --color-text-disabled:  #859299;
+      --color-text-inverse:   #ffffff;
+      --color-text-negative:  #d52b1e;
+
+      --color-bg-page:        #f0f4f6;
+      --color-bg-primary:     #ffffff;
+      --color-bg-secondary:   #f8fafb;
+      --color-bg-tertiary:    #f0f4f6;
+      --color-bg-dark:        #21262a;
+      --color-bg-navy:        #00254a;
+
+      --color-border-primary:   #e2e9ed;
+      --color-border-secondary: #c3ced5;
+      --color-border-focus:     #205ea3;
+
+      --color-divider:    #e2e9ed;
+
+      --color-icon-primary:   #0d233a;
+      --color-icon-secondary: #607280;
+      --color-icon-disabled:  #9aa7b0;
+
+      /* Status colors */
+      --color-pending:        #2b77cc;
+      --color-pending-bg:     #e0edff;
+      --color-linked:         #00a63b;
+      --color-linked-bg:      #d2f8d5;
+      --color-not-required:   #607280;
+      --color-not-required-bg:#f0f4f6;
+      --color-expired:        #c84f00;
+      --color-expired-bg:     #ffeac7;
+      --color-failed:         #b61a37;
+      --color-failed-bg:      #ffe7e7;
+      --color-not-linked:     #2b77cc;
+      --color-not-linked-bg:  #e0edff;
+
+      --color-warn-icon: #c84f00;
+      --color-negative:  #b61a37;
+
+      /* Typography */
+      --font: 'Nunito Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --fs-heading:   24px;
+      --fs-body:      14px;
+      --fs-body-sm:   13px;
+      --fs-label:     12px;
+      --fw-regular:   400;
+      --fw-medium:    500;
+      --fw-semibold:  600;
+      --fw-bold:      700;
+      --lh-body:      1.5;
+      --lh-heading:   1.25;
+
+      /* Radius */
+      --r-card:   12px;
+      --r-modal:  12px;
+      --r-input:   8px;
+      --r-btn:     8px;
+      --r-badge:   6px;
+      --r-tag:     4px;
+      --r-full:  999px;
+
+      /* Spacing */
+      --sp-2:  2px;  --sp-4:  4px;  --sp-6:  6px;
+      --sp-8:  8px;  --sp-12: 12px; --sp-16: 16px;
+      --sp-20: 20px; --sp-24: 24px; --sp-32: 32px;
+      --sp-40: 40px;
+
+      /* Elevation — IDS levels */
+      --shadow-card:    0 2px 8px rgba(0,0,0,0.08), 0 0 1px rgba(0,0,0,0.05);
+      --shadow-modal:   0 16px 48px rgba(0,0,0,0.18), 0 0 4px rgba(0,0,0,0.06);
+      --shadow-toast:   0px 8px 24px rgba(0,0,0,0.16), 0px 2px 8px rgba(0,0,0,0.08); /* IDS Level 4 */
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(ellipse 80% 55% at 50% 110%, #0a3d5c 0%, #021929 55%, #00254a 100%);
+      background-attachment: fixed;
+      font-family: var(--font);
+      font-size: var(--fs-body);
+      color: var(--color-text-primary);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      padding: 0 12px 12px;
+      box-sizing: border-box;
+    }
+
+    /* ── Loading screen ──────────────────────────────────────────────── */
+    .loading-screen {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 10000;
+      background: radial-gradient(ellipse 80% 55% at 50% 110%, #0a3d5c 0%, #021929 55%, #00254a 100%);
+      font-family: var(--font);
+    }
+    .loading-screen.exit {
+      animation: _loadingScreenOut 0.6s cubic-bezier(0.4,0,1,1) both;
+    }
+    @keyframes _loadingScreenOut {
+      from { opacity: 1; transform: scale(1);    filter: blur(0px); }
+      to   { opacity: 0; transform: scale(1.04); filter: blur(6px); }
+    }
+
+    /* Rocking asterisk icon */
+    @keyframes _aiThink {
+      0%   { transform: rotate(-22deg); }
+      30%  { transform: rotate(22deg);  }
+      55%  { transform: rotate(-14deg); }
+      80%  { transform: rotate(18deg);  }
+      100% { transform: rotate(-22deg); }
+    }
+    .loading-icon {
+      animation: _aiThink 2.6s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 14px;
+    }
+    .loading-icon.exit {
+      animation: _loadElemOut 0.3s cubic-bezier(0.4,0,1,1) both;
+    }
+
+    /* Shared enter / exit keyframes */
+    @keyframes _loadElemIn {
+      from { opacity: 0; transform: translateY(8px);  filter: blur(5px); }
+      to   { opacity: 1; transform: translateY(0);    filter: blur(0);   }
+    }
+    @keyframes _loadElemOut {
+      from { opacity: 1; transform: translateY(0);     filter: blur(0);   }
+      to   { opacity: 0; transform: translateY(-8px);  filter: blur(5px); }
+    }
+
+    /* "Loading" title — regular weight, ~16px, matches Figma */
+    .loading-title {
+      color: rgba(255,255,255,0.88);
+      font-size: 16px;
+      font-weight: var(--fw-regular);
+      font-family: var(--font);
+      letter-spacing: 0;
+      margin-bottom: 18px;
+      animation: _loadElemIn 0.5s cubic-bezier(0.15,0,0.1,1) 0.1s both;
+    }
+    .loading-title.exit {
+      animation: _loadElemOut 0.3s cubic-bezier(0.4,0,1,1) both;
+    }
+
+    /* Welcome message — larger, character-by-character reveal */
+    .loading-welcome {
+      color: rgba(255,255,255,0.92);
+      font-size: 26px;
+      font-weight: var(--fw-semibold);
+      font-family: var(--font);
+      letter-spacing: -0.01em;
+      text-align: center;
+      line-height: 1.3;
+    }
+    @keyframes _charIn {
+      from { opacity: 0; filter: blur(6px); transform: translateY(6px); }
+      to   { opacity: 1; filter: blur(0);   transform: translateY(0); }
+    }
+    .loading-welcome-char {
+      display: inline-block;
+      animation: _charIn 0.4s cubic-bezier(0.15,0,0.1,1) both;
+      white-space: pre;
+    }
+
+    /* Pill status items — dark translucent, no dot, matches Figma */
+    .loading-pills {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .loading-pill {
+      display: inline-flex; align-items: center;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: 13px;
+      font-family: var(--font);
+      color: rgba(255,255,255,0.6);
+      font-weight: var(--fw-regular);
+      animation: _loadElemIn 0.4s cubic-bezier(0.15,0,0.1,1) both;
+    }
+    .loading-pill.exit {
+      animation: _loadElemOut 0.28s cubic-bezier(0.4,0,1,1) both;
+    }
+
+    /* ── Portal card ─────────────────────────────────────────────────── */
+    .portal-card {
+      background: var(--color-bg-primary);
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: calc(100vh - 52px - 12px);
+    }
+
+    /* ── Topbar ──────────────────────────────────────────────────────── */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 var(--sp-24); height: 52px;
+      background: transparent;
+      position: relative;
+    }
+    .topbar-title {
+      font-size: var(--fs-body);
+      font-weight: var(--fw-bold);
+      color: var(--color-text-inverse);
+      letter-spacing: 0.01em;
+    }
+    .icon-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px;
+      border: none; background: transparent; cursor: pointer;
+      border-radius: var(--r-badge);
+      color: rgba(255,255,255,0.7);
+      transition: background .15s, color .15s;
+    }
+    .icon-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+    .icon-btn.dark { color: var(--color-icon-secondary); }
+    .icon-btn.dark:hover { background: var(--color-bg-tertiary); color: var(--color-icon-primary); }
+
+    /* ── User menu dropdown ──────────────────────────────────────────── */
+    .user-menu {
+      background: white; border-radius: var(--r-card);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+      padding: var(--sp-16); min-width: 220px;
+      display: flex; flex-direction: column; align-items: center; gap: var(--sp-8);
+    }
+    .user-menu-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #2d7ed6; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: var(--fw-bold);
+      margin-bottom: 2px;
+    }
+    .user-menu-name {
+      font-size: var(--fs-body); font-weight: var(--fw-bold);
+      color: var(--color-text-primary); text-align: center;
+    }
+    .user-menu-email {
+      font-size: var(--fs-caption); color: var(--color-text-secondary);
+      text-align: center; margin-bottom: 4px;
+    }
+    .user-menu-divider { width: 100%; height: 1px; background: var(--color-border-primary); margin: 4px 0; }
+    .user-menu-signout {
+      width: 100%; padding: 9px 0; border: 1px solid var(--color-border-secondary);
+      border-radius: var(--r-btn); background: white;
+      font-size: var(--fs-body); font-weight: var(--fw-semibold);
+      color: var(--color-text-primary); cursor: pointer; font-family: var(--font);
+      transition: background .15s;
+    }
+    .user-menu-signout:hover { background: var(--color-bg-secondary); }
+
+    /* ── Column header tooltip ───────────────────────────────────────── */
+    .th-tooltip-wrap { position: relative; display: inline-flex; align-items: center; gap: 4px; }
+    .th-tooltip-enter { animation: _tooltipIn  0.16s cubic-bezier(0.15,0,0.1,1) both; }
+    .th-tooltip-exit  { animation: _tooltipOut 0.12s cubic-bezier(0.4,0,1,1)    both; }
+    @keyframes _tooltipIn  { from { opacity:0; transform:translateX(-50%) translateY(4px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+    @keyframes _tooltipOut { from { opacity:1; transform:translateX(-50%) translateY(0); } to { opacity:0; transform:translateX(-50%) translateY(4px); } }
+    .th-tooltip {
+      position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+      background: #21262a; color: white;
+      font-size: 12px; font-weight: var(--fw-normal); line-height: 1.45;
+      padding: 10px 12px; border-radius: 6px;
+      width: 220px; z-index: 100;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.22);
+      pointer-events: none; white-space: normal;
+    }
+    .th-tooltip::before {
+      content: ""; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+      border: 6px solid transparent; border-bottom-color: #21262a;
+    }
+    .th-tooltip-title { font-weight: var(--fw-bold); margin-bottom: 4px; font-size: 12px; }
+
+    /* ── Page content ────────────────────────────────────────────────── */
+    .page-content { padding: var(--sp-32) var(--sp-40) var(--sp-40); }
+    .page-heading {
+      font-size: var(--fs-heading);
+      font-weight: var(--fw-bold);
+      color: var(--color-text-primary);
+      line-height: var(--lh-heading);
+      margin: 0 0 var(--sp-16) 0;
+    }
+
+    /* ── Status badge ────────────────────────────────────────────────── */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: var(--sp-8);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--r-badge);
+      padding: var(--sp-6) var(--sp-12);
+      font-size: var(--fs-body);
+      color: var(--color-text-primary);
+      margin-bottom: var(--sp-24);
+      background: var(--color-bg-primary);
+    }
+    .status-badge.complete {
+      border-color: #b3cef0;
+      background: #e8f1fb;
+      color: var(--ies-link);
+    }
+    .info-banner {
+      display: flex; align-items: flex-start; gap: var(--sp-12);
+      background: var(--color-bg-primary); border: 1.5px solid var(--color-border-primary);
+      border-radius: var(--r-badge);
+      padding: var(--sp-12) var(--sp-16);
+      font-size: var(--fs-body); color: var(--color-text-primary);
+      margin-bottom: var(--sp-24);
+      animation: _slideUp 0.28s cubic-bezier(0.15,0,0.1,1) both;
+    }
+    .info-banner-icon { color: var(--ies-link); flex-shrink:0; display:flex; margin-top:1px; }
+
+    /* ── Filter / search ─────────────────────────────────────────────── */
+    .filter-bar { display: flex; align-items: flex-end; gap: var(--sp-12); margin-bottom: var(--sp-16); }
+    .filter-label { font-size: var(--fs-label); color: var(--color-text-tertiary); margin-bottom: 3px; display: block; font-weight: var(--fw-medium); }
+
+    .select-wrap { position: relative; }
+    .ids-select {
+      appearance: none; height: 36px;
+      border: 1.5px solid var(--color-border-primary);
+      border-radius: var(--r-input);
+      padding: 0 30px 0 var(--sp-12);
+      font-size: var(--fs-body); font-family: var(--font);
+      color: var(--color-text-primary);
+      background: var(--color-bg-primary);
+      cursor: pointer; outline: none; min-width: 172px;
+      transition: border-color .15s;
+    }
+    .ids-select:hover { border-color: var(--color-border-secondary); }
+    .ids-select:focus { border-color: var(--color-border-focus); box-shadow: 0 0 0 3px rgba(32,94,163,0.12); }
+    .select-chev { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--color-icon-secondary); }
+
+    /* ── Custom filter dropdown ──────────────────────────────────────── */
+    .flt-trigger {
+      display: inline-flex; align-items: center; justify-content: space-between;
+      gap: var(--sp-8); height: 36px; min-width: 172px;
+      padding: 0 10px 0 var(--sp-12);
+      border: 1.5px solid var(--color-border-primary);
+      border-radius: var(--r-input);
+      background: var(--color-bg-primary);
+      font-size: var(--fs-body); font-family: var(--font);
+      color: var(--color-text-primary);
+      cursor: pointer; outline: none;
+      transition: border-color .15s;
+    }
+    .flt-trigger:hover { border-color: var(--color-border-secondary); }
+    .flt-trigger.open { border-color: var(--color-border-focus); box-shadow: 0 0 0 3px rgba(32,94,163,0.12); }
+    .flt-menu {
+      background: var(--color-bg-primary);
+      border: 1.5px solid var(--color-border-primary);
+      border-radius: var(--r-input);
+      box-shadow: 0px 8px 24px rgba(0,0,0,0.12), 0px 2px 8px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .flt-menu-enter { animation: _slideUp   0.18s cubic-bezier(0.15,0,0.1,1) both; }
+    .flt-menu-exit  { animation: _slideDown 0.15s cubic-bezier(0.4,0,1,1)    both; }
+    .flt-option {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: var(--sp-8); padding: 9px var(--sp-12);
+      font-size: var(--fs-body); font-family: var(--font);
+      color: var(--color-text-primary);
+      cursor: pointer; background: none; border: none; width: 100%;
+      text-align: left; white-space: nowrap;
+      transition: background .12s;
+    }
+    .flt-option:hover { background: var(--color-bg-secondary); }
+    .flt-option.selected { background: var(--color-bg-secondary); }
+
+    .search-wrap {
+      display: flex; align-items: center; gap: var(--sp-8); height: 36px;
+      border: 1.5px solid var(--color-border-primary);
+      border-radius: var(--r-input);
+      padding: 0 var(--sp-12);
+      background: var(--color-bg-primary);
+      transition: border-color .15s;
+    }
+    .search-wrap:focus-within { border-color: var(--color-border-focus); box-shadow: 0 0 0 3px rgba(32,94,163,0.12); }
+    .search-wrap input {
+      border: none; outline: none; background: transparent;
+      font-size: var(--fs-body); font-family: var(--font);
+      color: var(--color-text-primary); width: 130px;
+    }
+    .search-wrap input::placeholder { color: var(--color-text-tertiary); }
+
+    /* ── Bulk toolbar ────────────────────────────────────────────────── */
+    .bulk-toolbar {
+      display: inline-flex; align-items: center; gap: var(--sp-8);
+      background: #2b3135;
+      border-radius: var(--r-btn); padding: var(--sp-8) var(--sp-12);
+    }
+    .bulk-label { font-size: var(--fs-label); color: #859299; font-weight: var(--fw-semibold); white-space: nowrap; }
+    .bulk-btn {
+      height: 28px; padding: 0 var(--sp-12);
+      border: none; border-radius: var(--r-badge);
+      background: #3c4348; color: white;
+      font-size: var(--fs-label); font-family: var(--font);
+      font-weight: var(--fw-bold); cursor: pointer; transition: background .15s;
+      white-space: nowrap;
+    }
+    .bulk-btn:hover { background: #4c555b; }
+    .bulk-count { font-size: var(--fs-label); color: var(--color-text-tertiary); margin-top: 4px; padding-left: 2px; }
+
+    /* ── Table ───────────────────────────────────────────────────────── */
+    .ids-table-container { width: 100%; }
+    .ids-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .ids-table thead tr { background: var(--color-bg-primary); }
+    .ids-table th { padding: var(--sp-12) var(--sp-16); text-align: left; font-size: var(--fs-label); font-weight: var(--fw-bold); color: var(--color-text-primary); white-space: nowrap; }
+    .ids-table td { padding: 13px var(--sp-16); font-size: var(--fs-body); color: var(--color-text-primary); border-bottom: 1px solid var(--color-divider); }
+    /* Body border via first/last td borders */
+    .ids-tbody-bordered tr td { border-top: none; }
+    .ids-tbody-bordered tr:first-child td { border-top: 1.5px solid var(--color-border-primary); }
+    .ids-tbody-bordered tr:last-child td { border-bottom: none; }
+    .ids-tbody-bordered tr td:first-child { border-left: 1.5px solid var(--color-border-primary); }
+    .ids-tbody-bordered tr td.col-cb.collapsed + td { border-left: 1.5px solid var(--color-border-primary); }
+    .ids-tbody-bordered tr:first-child td.col-cb.collapsed + td { border-top-left-radius: var(--r-badge); }
+    .ids-tbody-bordered tr:last-child td.col-cb.collapsed + td { border-bottom-left-radius: var(--r-badge); }
+    .ids-tbody-bordered tr td:last-child { border-right: 1.5px solid var(--color-border-primary); }
+    /* Bottom border on last row */
+    .ids-tbody-bordered tr:last-child td { border-bottom: 1.5px solid var(--color-border-primary); }
+    /* Rounded corners on corner cells */
+    .ids-tbody-bordered tr:first-child td:first-child { border-top-left-radius: var(--r-badge); }
+    .ids-tbody-bordered tr:first-child td:last-child { border-top-right-radius: var(--r-badge); }
+    .ids-tbody-bordered tr:last-child td:first-child { border-bottom-left-radius: var(--r-badge); }
+    .ids-tbody-bordered tr:last-child td:last-child { border-bottom-right-radius: var(--r-badge); }
+    /* Row transition */
+    .ids-table tbody tr { transition: background .1s; }
+    .ids-table tbody tr:hover { background: var(--color-bg-secondary); }
+    .ids-table tbody tr.selected { background: #f0f6ff; }
+    @keyframes _rowFlash {
+      0%   { background: #F5FCFF; }
+      40%  { background: #F5FCFF; }
+      100% { background: transparent; }
+    }
+    .ids-table tbody tr.row-updated { animation: _rowFlash 2s cubic-bezier(0.4, 0, 0.6, 1) forwards; }
+
+    /* ── Checkbox ────────────────────────────────────────────────────── */
+    .ids-cb {
+      width: 16px; height: 16px; border-radius: var(--r-tag);
+      border: 1.5px solid var(--color-border-secondary);
+      background: var(--color-bg-primary);
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; transition: border-color .12s, background .12s;
+    }
+    .ids-cb.on { background: var(--ies-navy); border-color: var(--ies-navy); }
+    .ids-cb:hover:not(.on) { border-color: var(--ies-link); }
+
+    /* ── Linking status badges (table) ───────────────────────────────── */
+    .ls-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: var(--fs-body); cursor: pointer;
+      transition: opacity .12s;
+    }
+    .ls-badge:hover { opacity: 0.75; }
+    .ls-badge.pending   { color: var(--color-pending); font-weight: var(--fw-semibold); }
+    .ls-badge.linked    { color: var(--color-linked); }
+    .ls-badge.not-required { color: var(--color-not-required); }
+    .ls-badge.not-linked   { color: var(--color-not-linked); font-weight: var(--fw-semibold); }
+    .ls-badge.expired   { color: var(--color-expired); font-weight: var(--fw-semibold); }
+    .ls-badge.failed    { color: var(--color-failed); font-weight: var(--fw-semibold); }
+
+    /* ── Checkbox column collapse on complete ────────────────────────── */
+    @keyframes _cbOut { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(0.5); } }
+    .col-cb { transition: width 0.4s cubic-bezier(0.15,0,0.1,1), padding 0.4s cubic-bezier(0.15,0,0.1,1), opacity 0.3s ease; overflow:hidden; white-space:nowrap; }
+    .col-cb.collapsing .cb-inner { animation: _cbOut 0.25s cubic-bezier(0.4,0,1,1) both; }
+    .col-cb.collapsed { width:0!important; padding:0!important; opacity:0; }
+
+    /* ── Ready badge ─────────────────────────────────────────────────── */
+    .ready-on  { display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--ies-link); }
+    .ready-off { display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;border:2px solid var(--color-border-primary);background:var(--color-bg-primary); }
+    .col-ready { white-space:nowrap; }
+    /* Read-only form state */
+    .ids-input[readonly] { background:var(--color-bg-secondary); color:var(--color-text-secondary); cursor:default; }
+    .ids-select[disabled] { background:var(--color-bg-secondary); color:var(--color-text-secondary); cursor:default; opacity:1; }
+    .readonly-notice { display:flex;align-items:center;gap:var(--sp-8);padding:var(--sp-10) var(--sp-12);background:#f8fafb;border:1.5px solid var(--color-border-primary);border-radius:var(--r-badge);font-size:var(--fs-label);color:var(--color-text-secondary);margin-bottom:var(--sp-16); }
+
+    /* ── Primary badge ───────────────────────────────────────────────── */
+    .primary-tag {
+      display: inline-block; font-size: 10px; font-weight: var(--fw-bold);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      background: var(--ies-navy); color: white;
+      border-radius: var(--r-tag); padding: 1px 6px; margin-bottom: 2px;
+    }
+
+    /* ── Cell inline buttons ─────────────────────────────────────────── */
+    .cell-add { display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-body);font-weight:var(--fw-semibold);color:var(--ies-link);background:none;border:none;cursor:pointer;padding:0; }
+    .cell-add:hover { text-decoration: underline; }
+    .cell-edit { display:inline-flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;padding:2px 4px 2px 0;border-radius:var(--r-tag);color:var(--color-text-primary);font-size:var(--fs-body);font-family:var(--font); }
+    .cell-edit:hover { color: var(--ies-link); }
+    .cell-edit-icon { color:var(--color-icon-secondary);display:inline-flex;align-items:center;opacity:0;transition:opacity .12s; }
+    tr:hover .cell-edit-icon { opacity: 1; }
+    .cell-edit:hover .cell-edit-icon { color: var(--ies-link); }
+
+    /* ── Pagination ──────────────────────────────────────────────────── */
+    .pagination { display:flex;align-items:center;justify-content:space-between;padding:var(--sp-12) var(--sp-16) 0;font-size:var(--fs-label);color:var(--color-text-tertiary); }
+    .pg-controls { display:flex;align-items:center;gap:var(--sp-8); }
+    .page-num { border:1.5px solid var(--color-border-primary);border-radius:var(--r-badge);padding:2px 8px;font-size:var(--fs-label);font-weight:var(--fw-semibold);min-width:28px;text-align:center;background:var(--color-bg-primary);color:var(--color-text-primary); }
+    .pg-btn { display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:var(--r-badge);border:none;background:transparent;cursor:pointer;color:var(--color-icon-secondary);transition:background .12s; }
+    .pg-btn:hover:not(:disabled) { background: var(--color-bg-tertiary); }
+    .pg-btn:disabled { opacity:.35; cursor:default; }
+
+    /* ── Toast ───────────────────────────────────────────────────────── */
+    .toast {
+      display: inline-flex; align-items: center; gap: var(--sp-8);
+      background: var(--color-bg-primary);
+      border: 1px solid #8d9096;
+      box-shadow: var(--shadow-toast);
+      border-radius: 4px;
+      padding: var(--sp-16);
+      font-size: var(--fs-body); color: var(--color-text-primary);
+      white-space: nowrap;
+    }
+    .toast-icon { display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--ies-navy);flex-shrink:0; }
+
+    /* ── Modal ───────────────────────────────────────────────────────── */
+    .modal-overlay { position:fixed;inset:0;background:rgba(0,37,74,0.4);display:flex;align-items:center;justify-content:center;z-index:100; }
+    .modal { background:var(--color-bg-primary);border-radius:var(--r-modal);box-shadow:var(--shadow-modal);width:500px;overflow:hidden;display:flex;flex-direction:column; }
+    .modal-height-wrap { overflow:hidden;transition:height 0.32s cubic-bezier(0.15,0,0.1,1); }
+
+    .modal-header { display:flex;align-items:center;justify-content:space-between;padding:var(--sp-20) var(--sp-24) 0; }
+    .modal-back-header { display:flex;align-items:center;gap:var(--sp-8);padding:var(--sp-16) var(--sp-24) 0;border-bottom:1.5px solid var(--color-border-primary);padding-bottom:var(--sp-16); }
+    .btn-back { display:inline-flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;font-size:var(--fs-body);font-weight:var(--fw-semibold);color:var(--color-text-secondary);font-family:var(--font);padding:0;transition:color .15s; }
+    .btn-back:hover { color:var(--color-text-primary); }
+    .modal-back-title { font-size:var(--fs-body);font-weight:var(--fw-bold);color:var(--color-text-primary); }
+    .modal-title { font-size:16px;font-weight:var(--fw-bold);color:var(--color-text-primary); }
+    .modal-tabs { position:relative;display:flex;padding:0 var(--sp-24);margin-top:var(--sp-12); }
+    .modal-tab { flex:1;padding:0 0 10px;font-size:var(--fs-body);font-family:var(--font);font-weight:var(--fw-semibold);background:none;border:none;border-bottom:1.5px solid var(--color-border-primary);cursor:pointer;color:var(--color-text-tertiary);transition:color .2s;text-align:center; }
+    .modal-tab.active { color:var(--ies-navy); }
+    .modal-tab:hover:not(.active) { color:var(--color-text-secondary); }
+    .modal-tab-indicator { position:absolute;bottom:0;height:4px;background:#17497f;transition:left 0.28s cubic-bezier(0.15,0,0.1,1),width 0.28s cubic-bezier(0.15,0,0.1,1);pointer-events:none; }
+    .modal-body { overflow-y:auto;flex:1;padding:var(--sp-20) var(--sp-24); }
+    .modal-footer { padding:var(--sp-16) var(--sp-24); }
+
+    /* ── Form elements ───────────────────────────────────────────────── */
+    .form-section-title { display:flex;align-items:center;gap:var(--sp-8);font-size:var(--fs-body);font-weight:var(--fw-bold);color:var(--color-text-primary);margin-bottom:var(--sp-12); }
+    .form-label { display:block;font-size:var(--fs-label);color:var(--color-text-tertiary);margin-bottom:3px;font-weight:var(--fw-medium); }
+    .ids-input { width:100%;height:36px;border:1.5px solid var(--color-border-primary);border-radius:var(--r-input);padding:0 var(--sp-12);font-size:var(--fs-body);font-family:var(--font);color:var(--color-text-primary);background:var(--color-bg-primary);outline:none;transition:border-color .15s; }
+    .ids-input:focus { border-color:var(--color-border-focus);box-shadow:0 0 0 3px rgba(32,94,163,0.12); }
+    .ids-input.active { border-color:var(--color-border-focus); }
+    .form-row { display:flex;gap:var(--sp-12); }
+    .form-row .form-group { flex:1; }
+    .form-group { margin-bottom:var(--sp-12); }
+
+    /* ── Payment cards ───────────────────────────────────────────────── */
+    .pay-card { display:flex;align-items:flex-start;gap:var(--sp-12);padding:var(--sp-12);border-radius:var(--r-input);border:1.5px solid var(--color-border-primary);cursor:pointer;margin-bottom:var(--sp-8);transition:border-color .12s,background .12s; }
+    .pay-card.selected { border-color:var(--ies-navy);background:#f0f6ff; }
+    .pay-card:hover:not(.selected) { border-color:var(--color-border-secondary); }
+    .pay-card input[type=radio] { margin-top:2px;accent-color:var(--ies-navy); }
+    .pay-card-name { font-size:var(--fs-body);font-weight:var(--fw-semibold);color:var(--color-text-primary); }
+    .pay-card-sub { font-size:var(--fs-label);color:var(--color-text-tertiary);margin-top:2px; }
+
+    /* ── Linking panel ───────────────────────────────────────────────── */
+    .link-panel {
+      border: 1.5px solid var(--color-border-primary);
+      border-radius: var(--r-input);
+      padding: var(--sp-16);
+    }
+    .link-status-row { display:flex;align-items:center;gap:var(--sp-8);margin-bottom:var(--sp-12); }
+    .link-status-label { font-size:var(--fs-body);color:var(--color-text-secondary); }
+    .link-status-val { display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-body);font-weight:var(--fw-semibold); }
+    .link-status-val.pending    { color:var(--color-pending); }
+    .link-status-val.linked     { color:var(--color-linked); }
+    .link-status-val.not-linked { color:var(--color-not-linked); }
+    .link-status-val.not-required{color:var(--color-not-required); }
+    .link-status-val.expired    { color:var(--color-expired); }
+    .link-status-val.failed     { color:var(--color-failed); }
+
+    .link-body { font-size:var(--fs-body);color:var(--color-text-secondary);line-height:var(--lh-body);margin-bottom:var(--sp-12); }
+    .link-body p { margin:0 0 var(--sp-8) 0; }
+    .link-body p:last-child { margin:0; }
+    .link-actions { display:flex;justify-content:flex-end;margin-top:var(--sp-16); }
+
+    /* ── Buttons ─────────────────────────────────────────────────────── */
+    .btn-primary { width:100%;height:40px;background:var(--ies-navy);color:white;border:none;border-radius:var(--r-btn);font-size:var(--fs-body);font-family:var(--font);font-weight:var(--fw-bold);cursor:pointer;transition:background .15s; }
+    .btn-primary:hover { background:var(--ies-navy-hover); }
+
+    .btn-outline { height:36px;padding:0 var(--sp-16);background:transparent;color:var(--ies-navy);border:1.5px solid var(--ies-navy);border-radius:var(--r-btn);font-size:var(--fs-body);font-family:var(--font);font-weight:var(--fw-semibold);cursor:pointer;transition:all .15s;white-space:nowrap; }
+    .btn-outline:hover { background:#f0f6ff; }
+    .btn-outline:disabled { opacity:.45;cursor:default; }
+
+    /* ── Collapsible ─────────────────────────────────────────────────── */
+    .collapsible { border:1.5px solid var(--color-border-primary);border-radius:var(--r-input);overflow:hidden;margin-bottom:var(--sp-16); }
+    .collapsible-hdr { display:flex;align-items:center;justify-content:space-between;padding:var(--sp-8) var(--sp-16);font-size:var(--fs-body);font-weight:var(--fw-bold);color:var(--color-text-primary);background:var(--color-bg-secondary);cursor:pointer;border:none;width:100%;font-family:var(--font); }
+    .collapsible-hdr:hover { background:var(--color-bg-tertiary); }
+    .collapsible-item { padding:var(--sp-8) var(--sp-16);font-size:var(--fs-body);color:var(--color-text-secondary);border-top:1px solid var(--color-divider); }
+
+    .add-link { display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-body);font-weight:var(--fw-semibold);color:var(--ies-link);background:none;border:none;cursor:pointer;padding:var(--sp-4) 0; }
+    .add-link:hover { text-decoration:underline; }
+
+    /* ── Add payment form ────────────────────────────────────────────── */
+    .add-pmt-form { border:1.5px solid var(--color-border-primary);border-radius:var(--r-input);padding:var(--sp-16);margin-bottom:var(--sp-12);animation:_slideUp 0.2s cubic-bezier(0.15,0,0.1,1) both; }
+    .add-pmt-section-title { display:flex;align-items:center;gap:var(--sp-8);font-size:var(--fs-body);font-weight:var(--fw-bold);color:var(--color-text-primary);margin-bottom:var(--sp-12); }
+    .pmt-type-radios { display:flex;gap:var(--sp-16);margin-bottom:var(--sp-16); }
+    .pmt-type-radio { display:inline-flex;align-items:center;gap:var(--sp-8);font-size:var(--fs-body);cursor:pointer;font-family:var(--font); }
+    .pmt-type-radio input { accent-color:var(--ies-navy);width:16px;height:16px;cursor:pointer; }
+    .pmt-row { display:flex;gap:var(--sp-12);margin-bottom:var(--sp-12); }
+    .pmt-row .form-group { flex:1;margin-bottom:0; }
+    .pmt-checkbox-row { display:flex;align-items:center;gap:var(--sp-8);margin-bottom:var(--sp-12);font-size:var(--fs-body);cursor:pointer; }
+    .pmt-checkbox-row input { accent-color:var(--ies-navy);width:15px;height:15px;cursor:pointer; }
+    .card-input-wrap { position:relative; }
+    .card-input-wrap .ids-input { padding-right:48px; }
+    .card-brand { position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#1a1f71;letter-spacing:.05em;pointer-events:none; }
+    .cvv-label { display:flex;align-items:center;gap:4px; }
+    .pmt-form-actions { display:flex;gap:var(--sp-8);margin-top:var(--sp-4); }
+    .btn-sm-primary { height:34px;padding:0 var(--sp-16);background:var(--ies-navy);color:white;border:none;border-radius:var(--r-btn);font-size:var(--fs-body);font-family:var(--font);font-weight:var(--fw-semibold);cursor:pointer;transition:background .15s; }
+    .btn-sm-primary:hover { background:var(--ies-navy-hover); }
+    .btn-sm-outline { height:34px;padding:0 var(--sp-16);background:transparent;color:var(--color-text-secondary);border:1.5px solid var(--color-border-secondary);border-radius:var(--r-btn);font-size:var(--fs-body);font-family:var(--font);font-weight:var(--fw-semibold);cursor:pointer;transition:all .15s; }
+    .btn-sm-outline:hover { border-color:var(--color-border-focus);color:var(--color-text-primary); }
+
+    /* ── Sending state spinner ───────────────────────────────────────── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { animation: spin 0.9s linear infinite; }
+
+    /* ── Entry animations ────────────────────────────────────────────── */
+    @keyframes _toastIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes _toastOut {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(16px); }
+    }
+    @keyframes _modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(16px); }
+      to   { opacity: 1; transform: scale(1)    translateY(0); }
+    }
+    @keyframes _modalOut {
+      from { opacity: 1; transform: scale(1)    translateY(0); }
+      to   { opacity: 0; transform: scale(0.95) translateY(16px); }
+    }
+    @keyframes _fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes _fadeOut {
+      from { opacity: 1; }
+      to   { opacity: 0; }
+    }
+    @keyframes _slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes _pageIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* ── Inline skeleton shimmer ─────────────────────────────────────── */
+    /* Each .skel-wrap has a shimmering ::before overlay that fades out,
+       revealing the real content underneath. No JS state needed. */
+    @keyframes _shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position: 600px 0; }
+    }
+    @keyframes _skelOverlayOut {
+      0%   { opacity: 1; }
+      60%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    .skel-wrap { position: relative; display: inline-block; }
+    .skel-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -1px -2px;
+      border-radius: 5px;
+      background: linear-gradient(90deg, #dde0e5 25%, #eaecf0 50%, #dde0e5 75%);
+      background-size: 1200px 100%;
+      animation:
+        _shimmer 1.0s ease-in-out infinite,
+        _skelOverlayOut 0.7s cubic-bezier(0.15,0,0.1,1) both;
+      pointer-events: none;
+      z-index: 1;
+    }
+    /* Stagger delays — tightened */
+    .skel-d0::before { animation-delay: 0ms,   400ms; }
+    .skel-d1::before { animation-delay: 0ms,   480ms; }
+    .skel-d2::before { animation-delay: 0ms,   560ms; }
+    .skel-d3::before { animation-delay: 0ms,   680ms; }
+    .skel-d4::before { animation-delay: 0ms,   760ms; }
+    /* Row cells stagger further */
+    .skel-d5::before  { animation-delay: 0ms,  680ms; }
+    .skel-d6::before  { animation-delay: 0ms,  720ms; }
+    .skel-d7::before  { animation-delay: 0ms,  760ms; }
+    .skel-d8::before  { animation-delay: 0ms,  800ms; }
+    .skel-d9::before  { animation-delay: 0ms,  840ms; }
+    .skel-d10::before { animation-delay: 0ms,  880ms; }
+    .skel-d11::before { animation-delay: 0ms,  920ms; }
+    .skel-d12::before { animation-delay: 0ms,  960ms; }
+
+    @keyframes _cardOpen {
+      0%   { opacity: 0; transform: scaleY(0); }
+      100% { opacity: 1; transform: scaleY(1); }
+    }
+    .portal-card-enter {
+      animation: _cardOpen 0.7s cubic-bezier(0.16,1,0.3,1) both;
+      transform-origin: top center;
+    }
+    .pg-enter { animation: _pageIn 0.5s cubic-bezier(0.15,0,0.1,1) both; }
+    /* topbar enters before the card */
+    .pg-d0  { animation-delay: 0ms; }
+    /* inner content staggers after card has opened (~500ms) */
+    .pg-d1  { animation-delay: 480ms; }
+    .pg-d2  { animation-delay: 550ms; }
+    .pg-d3  { animation-delay: 620ms; }
+    .pg-d4  { animation-delay: 700ms; }
+    @keyframes _slideDown {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(8px); }
+    }
+
+    .anim-toast        { animation: _toastIn  0.32s cubic-bezier(0.15, 0, 0.1, 1) both; }
+    .anim-toast-out    { animation: _toastOut 0.24s cubic-bezier(0.4, 0, 1, 1)    both; }
+    .anim-modal        { animation: _modalIn  0.3s  cubic-bezier(0.15, 0, 0.1, 1) both; }
+    .anim-modal-out    { animation: _modalOut 0.22s cubic-bezier(0.4, 0, 1, 1)    both; }
+    .anim-overlay      { animation: _fadeIn   0.22s cubic-bezier(0.15, 0, 0.1, 1) both; }
+    .anim-overlay-out  { animation: _fadeOut  0.22s cubic-bezier(0.4, 0, 1, 1)    both; }
+    .anim-slide-up     { animation: _slideUp  0.24s cubic-bezier(0.15, 0, 0.1, 1) both; }
+    .anim-dropdown     { animation: _slideUp    0.2s  cubic-bezier(0.15, 0, 0.1, 1) both; }
+    .anim-dropdown-out { animation: _slideDown  0.15s cubic-bezier(0.4, 0, 1, 1)   both; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { useState, useEffect, useRef } = React;
+
+  /* ── Icons ─────────────────────────────────────────────────────────── */
+  const Ico = {
+    check: (c="currentColor",s=12) => <svg width={s} height={s} viewBox="0 0 12 12" fill="none"><path d="M2 6L4.5 8.5L10 3" stroke={c} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    x: (s=16) => <svg width={s} height={s} viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,
+    plus: (s=14) => <svg width={s} height={s} viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>,
+    pencil: () => <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M11 2.5l2.5 2.5-8 8H3v-2.5l8-8z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/></svg>,
+    gear: () => <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd"/></svg>,
+    chevDown: (s=16) => <svg width={s} height={s} viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    chevUp: (s=12) => <svg width={s} height={s} viewBox="0 0 12 12" fill="none"><path d="M3 8l3-3 3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    chevRight: () => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    chevLeft: () => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    search: () => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.5"/><path d="M11 11L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+    warn: (c="#c84f00") => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L1.5 14h13L8 2z" stroke={c} strokeWidth="1.5" strokeLinejoin="round"/><path d="M8 7v3M8 12v.5" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
+    clock: (c="currentColor",s=14) => <svg width={s} height={s} viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke={c} strokeWidth="1.5"/><path d="M8 5v3.5L10.5 10" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
+    link2: () => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M7 9a3.5 3.5 0 005 0l2-2a3.5 3.5 0 00-5-5L8 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><path d="M9 7a3.5 3.5 0 00-5 0L2 9a3.5 3.5 0 005 5l1-1" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>,
+    spinner: () => <svg className="spinner" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5" strokeDasharray="20 14" strokeLinecap="round"/></svg>,
+    location: () => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5C5.5 1.5 3.5 3.5 3.5 6c0 3.5 4.5 8.5 4.5 8.5S12.5 9.5 12.5 6c0-2.5-2-4.5-4.5-4.5zm0 6a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" stroke="currentColor" strokeWidth="1.3" fill="none"/></svg>,
+    company: () => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="5" width="12" height="9" rx="1" stroke="currentColor" strokeWidth="1.3"/><path d="M5 5V4a1 1 0 011-1h4a1 1 0 011 1v1" stroke="currentColor" strokeWidth="1.3"/><path d="M6 9h4M6 11.5h2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>,
+  };
+
+  /* ── Data ─────────────────────────────────────────────────────────── */
+  // linkingStatus: LINKED | PENDING | NOT_REQUIRED | NOT_LINKED | EXPIRED | FAILED
+  const INIT = [
+    { id:"1", companyName:"Horizon Construction",        isPrimary:true,  address:"123 Street Ave",      payment:"VISA 0000",                         linkingStatus:"NOT_REQUIRED" },
+    { id:"2", companyName:"Horizon Equipment",           address:"334 Hyde St",           payment:"Added by Intuit",                       linkingStatus:"LINKED" },
+    { id:"3", companyName:"Horizon Logistics",           address:"429 Post St",           payment:"Original QuickBooks Online payment",    linkingStatus:"PENDING" },
+    { id:"4", companyName:"High Plains Builders, LLC",   address:"456 Main St",           payment:"Original QuickBooks Online payment",    linkingStatus:"NOT_LINKED" },
+    { id:"5", companyName:"Tech Innovators Group",       address:null,                    payment:"DISC 1545",                             linkingStatus:"EXPIRED" },
+    { id:"6", companyName:"Quantum Solutions",           address:"20 Innovation Way",     payment:"Original QuickBooks Online payment",    linkingStatus:"LINKED" },
+    { id:"7", companyName:"Mountain View Logistics, Inc.", address:"33 Route 66",         payment:"Original QuickBooks Online payment",    linkingStatus:"FAILED" },
+    { id:"8", companyName:"Summit Contractors",          address:"789 Oak Blvd",          payment:null,                                    linkingStatus:"NOT_REQUIRED" },
+  ];
+
+  const PMTS = [
+    { id:"p1", label:"VISA",               sub:"From QuickBooks Online" },
+    { id:"p2", label:"VISA",               sub:"From QuickBooks Online", extra:"Mountain View Logistics, Inc." },
+    { id:"p3", label:"Apple Pay",          sub:"dev.crockett@gmail.com", extra:"Devon Crockett" },
+    { id:"p4", label:"Bank account *2345", sub:"Expires 03/2029",        extra:"Amelia Stevens" },
+  ];
+
+  const isComplete = e => !!(e.address && e.payment);
+
+  /* ── Linking copy / config ───────────────────────────────────────── */
+  const LINK_CFG = {
+    NOT_LINKED: {
+      label: "Not linked",
+      cls: "not-linked",
+      icon: () => Ico.clock("#2b77cc"),
+      body: <>
+        <p>To manage this company within the Enterprise Suite, we must connect this account to your parent organization.</p>
+        <p>This account is not yet connected. You can send a secure authorization request to this company's primary administrator below. Once they sign in and approve the request, the company will be fully linked to your suite.</p>
+      </>,
+      canResend: true,
+    },
+    PENDING: {
+      label: "Pending",
+      cls: "pending",
+      icon: () => Ico.clock("#2b77cc"),
+      body: <>
+        <p>To manage this company within the Enterprise Suite, we must connect this account to your parent organization.</p>
+        <p>A link request has been sent and is awaiting approval by the primary administrator. You can resend the request if needed.</p>
+      </>,
+      canResend: true,
+    },
+    LINKED: {
+      label: "Linked",
+      cls: "linked",
+      icon: () => Ico.check("#00a63b", 14),
+      body: <>
+        <p>This company is fully linked to your Enterprise Suite organization. No action is required.</p>
+      </>,
+      canResend: false,
+    },
+    NOT_REQUIRED: {
+      label: "Not required",
+      cls: "not-required",
+      icon: () => Ico.check("#607280", 14),
+      body: <>
+        <p>Linking is not required for this company. It is either the primary organization or has been marked as exempt from the linking requirement.</p>
+      </>,
+      canResend: false,
+    },
+    EXPIRED: {
+      label: "Expired",
+      cls: "expired",
+      icon: () => Ico.warn("#c84f00"),
+      body: <>
+        <p>The previous authorization request has expired. We will need to send a new request to this company's primary administrator.</p>
+        <p>Once they sign in and approve the request, the company will be fully linked to your suite.</p>
+      </>,
+      canResend: true,
+    },
+    FAILED: {
+      label: "Failed",
+      cls: "failed",
+      icon: () => Ico.warn("#b61a37"),
+      body: <>
+        <p>The previous authorization attempt was not completed. Please resend the authorization request to this company's primary administrator below.</p>
+        <p>Once they sign in and approve the request, the company will be fully linked to your suite.</p>
+      </>,
+      canResend: true,
+    },
+  };
+
+  /* ── Checkbox ────────────────────────────────────────────────────── */
+  function CB({ checked, indeterminate, onChange }) {
+    return (
+      <button type="button" onClick={onChange} className={`ids-cb${checked||indeterminate?" on":""}`}>
+        {indeterminate&&!checked ? <span style={{display:"block",width:8,height:1.5,background:"white",borderRadius:1}}/> : checked ? Ico.check("white",10) : null}
+      </button>
+    );
+  }
+
+  /* ── Linking status badge (table cell) ───────────────────────────── */
+  function LSBadge({ status, onClick, skelClass }) {
+    const cfg = LINK_CFG[status] || LINK_CFG.NOT_LINKED;
+    return (
+      <button className={`ls-badge ${cfg.cls}`} onClick={onClick} title="Click to manage linking">
+        {cfg.icon()} <span className={skelClass||""}>{cfg.label}</span>
+      </button>
+    );
+  }
+
+  /* ── Address form ────────────────────────────────────────────────── */
+  function AddrForm({ s1,ss1,s2,ss2,city,scity,st,sst,country,scountry,readOnly }) {
+    return <>
+      <div className="form-group">
+        <label className="form-label">Country</label>
+        <div className="select-wrap">
+          <select value={country} onChange={e=>!readOnly&&scountry(e.target.value)} disabled={readOnly} className="ids-select" style={{width:"100%"}}>
+            <option value="">Select a country</option>
+            <option>United States</option><option>Canada</option>
+          </select>
+          <span className="select-chev">{Ico.chevDown(14)}</span>
+        </div>
+      </div>
+      <div className="form-row">
+        <div className="form-group"><label className="form-label">Street address 1</label><input value={s1} onChange={e=>!readOnly&&ss1(e.target.value)} readOnly={readOnly} className="ids-input"/></div>
+        <div className="form-group"><label className="form-label">Street address 2</label><input value={s2} onChange={e=>!readOnly&&ss2(e.target.value)} readOnly={readOnly} className="ids-input"/></div>
+      </div>
+      <div className="form-row">
+        <div className="form-group"><label className="form-label">City</label><input value={city} onChange={e=>!readOnly&&scity(e.target.value)} readOnly={readOnly} className="ids-input"/></div>
+        <div className="form-group">
+          <label className="form-label">State/province</label>
+          <div className="select-wrap">
+            <select value={st} onChange={e=>!readOnly&&sst(e.target.value)} disabled={readOnly} className="ids-select" style={{width:"100%"}}>
+              <option value="">Select</option>
+              <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option>
+              <option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option>
+              <option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option>
+              <option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option>
+              <option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option>
+              <option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option>
+              <option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option>
+              <option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option>
+              <option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option>
+              <option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option>
+              <option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option>
+              <option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option>
+              <option>Wisconsin</option><option>Wyoming</option>
+              <option disabled>──────────</option>
+              <option>Alberta</option><option>British Columbia</option><option>Manitoba</option><option>New Brunswick</option>
+              <option>Newfoundland and Labrador</option><option>Nova Scotia</option><option>Ontario</option>
+              <option>Prince Edward Island</option><option>Quebec</option><option>Saskatchewan</option>
+            </select>
+            <span className="select-chev">{Ico.chevDown(14)}</span>
+          </div>
+        </div>
+      </div>
+    </>;
+  }
+
+  /* ── Payment list ─────────────────────────────────────────────────── */
+  const AddPaymentForm = React.forwardRef(function AddPaymentForm({ onAdd }, ref) {
+    const [pmtType, setPmtType] = useState("credit");
+    const [cardNum, setCardNum] = useState("");
+    const [expMon, setExpMon] = useState("");
+    const [expYr, setExpYr] = useState("");
+    const [cvv, setCvv] = useState("");
+    const [nameOnCard, setNameOnCard] = useState("");
+    const [useBillingAddr, setUseBillingAddr] = useState(false);
+    const [country, setCountry] = useState("");
+    const [street, setStreet] = useState("");
+    const [apt, setApt] = useState("");
+    const [city, setCity] = useState("");
+    const [st, setSt] = useState("");
+    const [zip, setZip] = useState("");
+    // Bank transfer fields
+    const [routingNum, setRoutingNum] = useState("");
+    const [acctNum, setAcctNum] = useState("");
+    const [acctType, setAcctType] = useState("checking");
+    const [bankName, setBankName] = useState("");
+
+    const cardBrand = cardNum.startsWith("4") ? "VISA" : cardNum.startsWith("5") ? "MC" : cardNum.startsWith("3") ? "AMEX" : cardNum.startsWith("6") ? "DISC" : "";
+
+    function handleAdd() {
+      if (pmtType === "credit") {
+        const digits = cardNum.replace(/\s/g,"");
+        const brand = cardBrand || "Card";
+        const last4 = digits.length >= 4 ? digits.slice(-4) : "••••";
+        const label = `${brand} *${last4}`;
+        const sub = expMon && expYr ? `Expires ${expMon}/${String(expYr).slice(-2)}` : undefined;
+        onAdd({ id: "new-" + Date.now(), label, sub, extra: nameOnCard || undefined });
+      } else {
+        const last4 = acctNum.length >= 4 ? acctNum.slice(-4) : "••••";
+        const label = `Bank account *${last4}`;
+        onAdd({ id: "new-" + Date.now(), label, sub: bankName || undefined, extra: `${acctType.charAt(0).toUpperCase()+acctType.slice(1)} account` });
+      }
+    }
+
+    React.useImperativeHandle(ref, () => ({ submit: handleAdd }));
+
+    const curYear = new Date().getFullYear();
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const years = Array.from({length:12},(_,i)=>curYear+i);
+
+    return (
+      <div className="add-pmt-form">
+        {/* Payment type toggle */}
+        <div className="pmt-type-radios">
+          <label className="pmt-type-radio">
+            <input type="radio" checked={pmtType==="credit"} onChange={()=>setPmtType("credit")}/> Credit card
+          </label>
+          <label className="pmt-type-radio">
+            <input type="radio" checked={pmtType==="bank"} onChange={()=>setPmtType("bank")}/> Bank transfer
+          </label>
+        </div>
+
+        {pmtType === "credit" ? (<>
+          {/* Card number */}
+          <div className="form-group">
+            <label className="form-label">Card number</label>
+            <div className="card-input-wrap">
+              <input className="ids-input" style={{width:"100%"}} placeholder="" maxLength={19}
+                value={cardNum} onChange={e=>setCardNum(e.target.value.replace(/\D/g,"").slice(0,16).replace(/(.{4})/g,"$1 ").trim())}/>
+              {cardBrand && <span className="card-brand">{cardBrand}</span>}
+            </div>
+          </div>
+
+          {/* Expiration + CVV */}
+          <div style={{display:"flex",gap:12,marginBottom:12}}>
+            <div className="form-group" style={{flex:1,minWidth:0,marginBottom:0}}>
+              <label className="form-label">Expiration</label>
+              <div style={{display:"flex",gap:8}}>
+                <div className="select-wrap" style={{flex:1,minWidth:0}}>
+                  <select value={expMon} onChange={e=>setExpMon(e.target.value)} className="ids-select" style={{width:"100%",minWidth:0}}>
+                    <option value="">Mon..</option>
+                    {months.map((m,i)=><option key={m} value={String(i+1).padStart(2,"0")}>{m}</option>)}
+                  </select>
+                  <span className="select-chev">{Ico.chevDown(14)}</span>
+                </div>
+                <div className="select-wrap" style={{flex:1,minWidth:0}}>
+                  <select value={expYr} onChange={e=>setExpYr(e.target.value)} className="ids-select" style={{width:"100%",minWidth:0}}>
+                    <option value="">Year</option>
+                    {years.map(y=><option key={y} value={y}>{y}</option>)}
+                  </select>
+                  <span className="select-chev">{Ico.chevDown(14)}</span>
+                </div>
+              </div>
+            </div>
+            <div className="form-group" style={{width:100,flexShrink:0,marginBottom:0}}>
+              <label className="form-label">
+                <span className="cvv-label">CVV
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style={{color:"var(--color-icon-secondary)"}}>
+                    <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
+                    <path d="M8 7v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    <circle cx="8" cy="4.5" r="1" fill="currentColor"/>
+                  </svg>
+                </span>
+              </label>
+              <input className="ids-input" style={{width:"100%"}} placeholder="•••" maxLength={4}
+                value={cvv} onChange={e=>setCvv(e.target.value.replace(/\D/g,""))}/>
+            </div>
+          </div>
+
+          {/* Name on card */}
+          <div className="form-group">
+            <label className="form-label">Name on card</label>
+            <input className="ids-input" style={{width:"100%"}} value={nameOnCard} onChange={e=>setNameOnCard(e.target.value)}/>
+          </div>
+
+          {/* Billing address */}
+          <label className="pmt-checkbox-row">
+            <input type="checkbox" checked={useBillingAddr} onChange={e=>setUseBillingAddr(e.target.checked)}/>
+            Use company address for billing address
+          </label>
+
+          {!useBillingAddr && (<>
+            <div className="form-group">
+              <label className="form-label">Country</label>
+              <div className="select-wrap">
+                <select value={country} onChange={e=>setCountry(e.target.value)} className="ids-select" style={{width:"100%"}}>
+                  <option value="">Country</option>
+                  <option>United States</option><option>Canada</option><option>United Kingdom</option>
+                </select>
+                <span className="select-chev">{Ico.chevDown(14)}</span>
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Street address</label>
+              <div style={{position:"relative"}}>
+                <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"var(--color-icon-secondary)",display:"flex"}}>{Ico.search()}</span>
+                <input className="ids-input" style={{width:"100%",paddingLeft:32}} value={street} onChange={e=>setStreet(e.target.value)}/>
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Apartment, building, floor, suite, etc.</label>
+              <input className="ids-input" style={{width:"100%"}} value={apt} onChange={e=>setApt(e.target.value)}/>
+            </div>
+            <div className="pmt-row">
+              <div className="form-group"><label className="form-label">City</label><input className="ids-input" style={{width:"100%"}} value={city} onChange={e=>setCity(e.target.value)}/></div>
+              <div className="form-group" style={{flex:"0 0 100px"}}>
+                <label className="form-label">State</label>
+                <div className="select-wrap">
+                  <select value={st} onChange={e=>setSt(e.target.value)} className="ids-select" style={{width:"100%"}}>
+                    <option value="">--</option>
+                    <option>AL</option><option>AK</option><option>AZ</option><option>AR</option><option>CA</option>
+                    <option>CO</option><option>CT</option><option>DE</option><option>FL</option><option>GA</option>
+                    <option>HI</option><option>ID</option><option>IL</option><option>IN</option><option>IA</option>
+                    <option>KS</option><option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+                    <option>MA</option><option>MI</option><option>MN</option><option>MS</option><option>MO</option>
+                    <option>MT</option><option>NE</option><option>NV</option><option>NH</option><option>NJ</option>
+                    <option>NM</option><option>NY</option><option>NC</option><option>ND</option><option>OH</option>
+                    <option>OK</option><option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+                    <option>SD</option><option>TN</option><option>TX</option><option>UT</option><option>VT</option>
+                    <option>VA</option><option>WA</option><option>WV</option><option>WI</option><option>WY</option>
+                  </select>
+                  <span className="select-chev">{Ico.chevDown(14)}</span>
+                </div>
+              </div>
+              <div className="form-group" style={{flex:"0 0 90px"}}><label className="form-label">ZIP</label><input className="ids-input" style={{width:"100%"}} maxLength={10} value={zip} onChange={e=>setZip(e.target.value)}/></div>
+            </div>
+          </>)}
+        </>) : (<>
+          {/* Bank transfer */}
+          <div className="form-group">
+            <label className="form-label">Routing number</label>
+            <input className="ids-input" style={{width:"100%"}} placeholder="9 digits" maxLength={9}
+              value={routingNum} onChange={e=>setRoutingNum(e.target.value.replace(/\D/g,""))}/>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Account number</label>
+            <input className="ids-input" style={{width:"100%"}} value={acctNum} onChange={e=>setAcctNum(e.target.value.replace(/\D/g,""))}/>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Account type</label>
+            <div className="pmt-type-radios" style={{marginBottom:0}}>
+              <label className="pmt-type-radio"><input type="radio" checked={acctType==="checking"} onChange={()=>setAcctType("checking")}/> Checking</label>
+              <label className="pmt-type-radio"><input type="radio" checked={acctType==="savings"} onChange={()=>setAcctType("savings")}/> Savings</label>
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Bank name</label>
+            <input className="ids-input" style={{width:"100%"}} value={bankName} onChange={e=>setBankName(e.target.value)}/>
+          </div>
+        </>)}
+
+      </div>
+    );
+  });
+
+  function PmtList({ pmts, sel, setSel, name, onAddNew, readOnly }) {
+    return <div>
+      {pmts.map(p=>(
+        <label key={p.id} className={`pay-card${sel===p.id?" selected":""}${readOnly?" readonly":""}`} style={readOnly?{cursor:"default"}:{}}>
+          <input type="radio" name={name} checked={sel===p.id} onChange={()=>setSel(p.id)} disabled={readOnly}/>
+          <div><div className="pay-card-name">{p.label}</div>{p.sub&&<div className="pay-card-sub">{p.sub}</div>}{p.extra&&<div className="pay-card-sub">{p.extra}</div>}</div>
+        </label>
+      ))}
+      {!readOnly && <button className="add-link" onClick={onAddNew}>{Ico.plus(12)} Add payment method</button>}
+    </div>;
+  }
+
+  /* ── Linking tab panel ───────────────────────────────────────────── */
+  function LinkingPanel({ entity, onResent }) {
+    const cfg = LINK_CFG[entity.linkingStatus] || LINK_CFG.NOT_LINKED;
+    const [sending, setSending] = useState(false);
+    const [justSent, setJustSent] = useState(false);
+
+    function handleResend() {
+      setSending(true);
+      setTimeout(() => {
+        setSending(false);
+        setJustSent(true);
+        onResent(entity.id);
+        setTimeout(() => setJustSent(false), 4000);
+      }, 1200);
+    }
+
+    const currentStatus = justSent ? "PENDING" : entity.linkingStatus;
+    const displayCfg = LINK_CFG[currentStatus] || cfg;
+
+    return (
+      <div>
+        <div className="form-section-title" style={{marginBottom:12}}>{Ico.link2()} Company linking</div>
+        <div className="link-panel">
+          <div className="link-status-row">
+            <span className="link-status-label">Status:</span>
+            <span className={`link-status-val ${displayCfg.cls}`}>
+              {displayCfg.icon()} {displayCfg.label}
+            </span>
+          </div>
+          <div className="link-body">{displayCfg.body}</div>
+          {displayCfg.canResend && (
+            <div className="link-actions">
+              <button
+                className="btn-outline"
+                onClick={handleResend}
+                disabled={sending || justSent}
+              >
+                {sending ? <span style={{display:"flex",alignItems:"center",gap:6}}>{Ico.spinner()} Sending…</span> : "Resend request"}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Sliding tab bar ─────────────────────────────────────────────── */
+  function TabBar({ tabs, active, onChange }) {
+    const tabRefs = React.useRef({});
+    const [indicator, setIndicator] = React.useState({ left: 0, width: 0 });
+    const containerRef = React.useRef(null);
+
+    useEffect(() => {
+      const el = tabRefs.current[active];
+      if (!el) return;
+      // offsetLeft/offsetWidth are relative to offsetParent — reliable regardless of scroll
+      setIndicator({ left: el.offsetLeft, width: el.offsetWidth });
+    }, [active]);
+
+    return (
+      <div className="modal-tabs" ref={containerRef}>
+        {tabs.map(t => (
+          <button
+            key={t}
+            ref={el => tabRefs.current[t] = el}
+            onClick={() => onChange(t)}
+            className={`modal-tab${active === t ? " active" : ""}`}
+          >{t}</button>
+        ))}
+        <div className="modal-tab-indicator" style={{ left: indicator.left, width: indicator.width }} />
+      </div>
+    );
+  }
+
+  /* ── Modal dismiss context ───────────────────────────────────────── */
+  const DismissCtx = React.createContext(() => {});
+
+  /* ── Modal shell: handles overlay + exit animation ──────────────── */
+  function ModalShell({ onClose, children }) {
+    const [leaving, setLeaving] = useState(false);
+    const afterRef = React.useRef(null);
+    function dismiss(after) {
+      afterRef.current = after || null;
+      setLeaving(true);
+    }
+    useEffect(() => {
+      if (!leaving) return;
+      const t = setTimeout(() => {
+        afterRef.current?.();
+        onClose();
+      }, 240);
+      return () => clearTimeout(t);
+    }, [leaving]);
+    return (
+      <DismissCtx.Provider value={dismiss}>
+        <div
+          className={`modal-overlay ${leaving ? "anim-overlay-out" : "anim-overlay"}`}
+          onClick={e => e.target === e.currentTarget && dismiss()}
+        >
+          <div className={`modal ${leaving ? "anim-modal-out" : "anim-modal"}`}>
+            {children}
+          </div>
+        </div>
+      </DismissCtx.Provider>
+    );
+  }
+
+  /* ── Animated height wrapper ─────────────────────────────────────── */
+  function AnimHeight({ children }) {
+    const outerRef = React.useRef(null);
+    const innerRef = React.useRef(null);
+    useEffect(() => {
+      const inner = innerRef.current;
+      const outer = outerRef.current;
+      if (!inner || !outer) return;
+      const ro = new ResizeObserver(() => {
+        outer.style.height = inner.offsetHeight + "px";
+      });
+      ro.observe(inner);
+      outer.style.height = inner.offsetHeight + "px";
+      return () => ro.disconnect();
+    }, []);
+    return (
+      <div className="modal-height-wrap" ref={outerRef}>
+        <div ref={innerRef}>{children}</div>
+      </div>
+    );
+  }
+
+  /* ── Edit modal ──────────────────────────────────────────────────── */
+  function EditModalInner({ entity, initialTab, readOnly, onSave, onResent }) {
+    const dismiss = React.useContext(DismissCtx);
+    const [tab, setTab] = useState(initialTab||"Company");
+    const [name, setName] = useState(entity.companyName);
+    const [s1,ss1] = useState(entity.address||"");
+    const [s2,ss2] = useState("");
+    const [city,scity] = useState("");
+    const [st,sst] = useState("");
+    const [country,scountry] = useState("");
+    const [pmts, setPmts] = useState(PMTS);
+    const [selPmt, setSelPmt] = useState("p1");
+    const [addingPayment, setAddingPayment] = useState(false);
+    const addFormRef = React.useRef(null);
+
+    function save() {
+      const pmt = pmts.find(p=>p.id===selPmt)?.label;
+      dismiss(() => onSave({ companyName:name, address:s1||entity.address, payment:tab==="Payment"?pmt:entity.payment }));
+    }
+
+    function handleAddPayment(newPmt) {
+      setPmts(p => [...p, newPmt]);
+      setSelPmt(newPmt.id);
+      setAddingPayment(false);
+    }
+
+    function handleTabChange(t) { setTab(t); setAddingPayment(false); }
+
+    const ro = readOnly && tab !== "Linking";
+
+    return (
+        <div>
+          {addingPayment ? (
+            <div className="modal-back-header" className="anim-slide-up">
+              <button className="btn-back" onClick={()=>setAddingPayment(false)}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Payment methods
+              </button>
+              <span style={{flex:1}}/>
+              <button onClick={()=>dismiss()} className="icon-btn dark">{Ico.x()}</button>
+            </div>
+          ) : (<>
+            <div className="modal-header">
+              <span className="modal-title">{entity.companyName}</span>
+              <button onClick={()=>dismiss()} className="icon-btn dark">{Ico.x()}</button>
+            </div>
+            <TabBar tabs={["Company","Payment","Linking"]} active={tab} onChange={handleTabChange}/>
+          </>)}
+          <AnimHeight>
+            <div className="modal-body anim-slide-up" key={addingPayment?"add":"list"}>
+              {ro && (
+                <div className="readonly-notice">
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.4"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
+                  <span>Your order has been submitted. This information is now read-only.</span>
+                </div>
+              )}
+              {addingPayment ? (
+                <AddPaymentForm ref={addFormRef} onAdd={handleAddPayment}/>
+              ) : (<>
+                {tab==="Company" && <>
+                  <div style={{marginBottom:20}}>
+                    <div className="form-section-title">{Ico.company()} Company name</div>
+                    <div className="form-group">
+                      <label className="form-label">Legal entity name</label>
+                      <input value={name} onChange={e=>!ro&&setName(e.target.value)} readOnly={ro} className="ids-input active"/>
+                    </div>
+                  </div>
+                  <div className="form-section-title">{Ico.location()} Addresses</div>
+                  <AddrForm s1={s1} ss1={ss1} s2={s2} ss2={ss2} city={city} scity={scity} st={st} sst={sst} country={country} scountry={scountry} readOnly={ro}/>
+                </>}
+                {tab==="Payment" && <PmtList pmts={pmts} sel={selPmt} setSel={v=>!ro&&setSelPmt(v)} name="single-pmt" onAddNew={ro?null:()=>setAddingPayment(true)} readOnly={ro}/>}
+                {tab==="Linking" && <LinkingPanel entity={entity} onResent={(id)=>{ onResent(id); }}/>}
+              </>)}
+            </div>
+            {!ro && (addingPayment || tab!=="Linking") && (
+              <div className="modal-footer">
+                {addingPayment
+                  ? <button className="btn-primary" onClick={()=>addFormRef.current?.submit()}>Add</button>
+                  : <button className="btn-primary" onClick={save}>Save</button>
+                }
+              </div>
+            )}
+          </AnimHeight>
+        </div>
+    );
+  }
+
+  function EditModal({ entity, initialTab, readOnly, onClose, onSave, onResent }) {
+    return (
+      <ModalShell onClose={onClose}>
+        <EditModalInner entity={entity} initialTab={initialTab} readOnly={readOnly} onSave={onSave} onResent={onResent}/>
+      </ModalShell>
+    );
+  }
+
+  /* ── Bulk edit modal ─────────────────────────────────────────────── */
+  function BulkModalInner({ entities, mode, onSave }) {
+    const dismiss = React.useContext(DismissCtx);
+    const [tab, setTab] = useState(mode==="payment"?"Payment":"Company");
+    const [expanded, setExpanded] = useState(true);
+    const [s1,ss1] = useState("123 Street Ave");
+    const [s2,ss2] = useState("");
+    const [city,scity] = useState("San Francisco");
+    const [st,sst] = useState("");
+    const [country,scountry] = useState("");
+    const [pmts, setPmts] = useState(PMTS);
+    const [selPmt, setSelPmt] = useState("p1");
+    const [addingPayment, setAddingPayment] = useState(false);
+    const addFormRef = React.useRef(null);
+
+    function handleAddPayment(newPmt) {
+      setPmts(p => [...p, newPmt]);
+      setSelPmt(newPmt.id);
+      setAddingPayment(false);
+    }
+
+    function handleTabChange(t) { setTab(t); setAddingPayment(false); }
+
+    return (
+        <div>
+          {addingPayment ? (
+            <div className="modal-back-header" className="anim-slide-up">
+              <button className="btn-back" onClick={()=>setAddingPayment(false)}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Payment methods
+              </button>
+              <span style={{flex:1}}/>
+              <button onClick={()=>dismiss()} className="icon-btn dark">{Ico.x()}</button>
+            </div>
+          ) : (<>
+            <div className="modal-header">
+              <span className="modal-title">Bulk edit</span>
+              <button onClick={()=>dismiss()} className="icon-btn dark">{Ico.x()}</button>
+            </div>
+            <TabBar tabs={["Company","Payment","Linking"]} active={tab} onChange={handleTabChange}/>
+          </>)}
+          <AnimHeight>
+            <div className="modal-body anim-slide-up" key={addingPayment?"add":"list"}>
+              {addingPayment ? (
+                <AddPaymentForm ref={addFormRef} onAdd={handleAddPayment}/>
+              ) : (<>
+                <div className="collapsible">
+                  <button className="collapsible-hdr" onClick={()=>setExpanded(v=>!v)}>
+                    <span>Editing:</span>{expanded?Ico.chevUp():Ico.chevDown(12)}
+                  </button>
+                  {expanded&&entities.map(e=><div key={e.id} className="collapsible-item">{e.companyName}</div>)}
+                </div>
+                {tab==="Company" && <><div className="form-section-title">{Ico.location()} Addresses</div><AddrForm s1={s1} ss1={ss1} s2={s2} ss2={ss2} city={city} scity={scity} st={st} sst={sst} country={country} scountry={scountry}/></>}
+                {tab==="Payment" && <PmtList pmts={pmts} sel={selPmt} setSel={setSelPmt} name="bulk-pmt" onAddNew={()=>setAddingPayment(true)}/>}
+                {tab==="Linking" && <p style={{color:"var(--color-text-tertiary)",textAlign:"center",padding:"32px 0"}}>Bulk linking management coming soon.</p>}
+              </>)}
+            </div>
+            {(addingPayment || tab!=="Linking") && (
+              <div className="modal-footer">
+                {addingPayment
+                  ? <button className="btn-primary" onClick={()=>addFormRef.current?.submit()}>Add</button>
+                  : <button className="btn-primary" onClick={()=>dismiss(()=>onSave(s1, pmts.find(p=>p.id===selPmt)?.label, tab))}>Save</button>
+                }
+              </div>
+            )}
+          </AnimHeight>
+        </div>
+    );
+  }
+
+  function BulkModal({ entities, mode, onClose, onSave }) {
+    return (
+      <ModalShell onClose={onClose}>
+        <BulkModalInner entities={entities} mode={mode} onSave={onSave}/>
+      </ModalShell>
+    );
+  }
+
+  /* ── Toast ───────────────────────────────────────────────────────── */
+  function Toast({ message, onDone }) {
+    const [leaving, setLeaving] = useState(false);
+    useEffect(() => {
+      const t = setTimeout(() => setLeaving(true), 3200);
+      return () => clearTimeout(t);
+    }, []);
+    useEffect(() => {
+      if (!leaving) return;
+      const t = setTimeout(onDone, 260);
+      return () => clearTimeout(t);
+    }, [leaving]);
+    return (
+      <div className={leaving ? "anim-toast-out" : "anim-toast"}>
+        <div className="toast"><span className="toast-icon">{Ico.check("white",10)}</span>{message}</div>
+      </div>
+    );
+  }
+
+  /* ── Entity row ──────────────────────────────────────────────────── */
+  function ERow({ entity, selected, updated, allDone, exitingCb, rowIndex, onToggle, onEdit, onLinkClick }) {
+    const done = isComplete(entity);
+    const cls = [selected ? "selected" : "", updated ? "row-updated" : ""].filter(Boolean).join(" ");
+    const sd = `skel-wrap skel-d${Math.min(5 + rowIndex, 12)}`;
+    return (
+      <tr className={cls}>
+        <td className={`col-cb${exitingCb?" collapsing":allDone?" collapsed":""}`}><div className="cb-inner"><CB checked={selected} onChange={onToggle}/></div></td>
+        <td>
+          {entity.isPrimary&&<div><span className="primary-tag">Primary</span></div>}
+          <span className={sd}>{entity.companyName}</span>
+        </td>
+        <td>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            {entity.address
+              ? <button className="cell-edit" onClick={()=>onEdit(entity,"Company")}><span className={sd}>{entity.address}</span><span className="cell-edit-icon">{Ico.pencil()}</span></button>
+              : <button className="cell-add" onClick={()=>onEdit(entity,"Company")}>{Ico.plus(12)}Add</button>}
+          </div>
+        </td>
+        <td>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            {entity.payment
+              ? <button className="cell-edit" onClick={()=>onEdit(entity,"Payment")}><span className={sd}>{entity.payment}</span><span className="cell-edit-icon">{Ico.pencil()}</span></button>
+              : <button className="cell-add" onClick={()=>onEdit(entity,"Payment")}>{Ico.plus(12)}Add</button>}
+          </div>
+        </td>
+        <td><LSBadge status={entity.linkingStatus} onClick={()=>onLinkClick(entity)} skelClass={sd}/></td>
+        <td className="col-ready">
+          {done
+            ? <span className="ready-on">{Ico.check("white",12)}</span>
+            : <span className="ready-off">{Ico.check("var(--color-border-primary)",12)}</span>
+          }
+        </td>
+      </tr>
+    );
+  }
+
+  /* ── App ─────────────────────────────────────────────────────────── */
+  const PAGE_SIZE = 10;
+
+  /* ── User menu dropdown ─────────────────────────────────────────────── */
+  function UserMenu({ anchorRef, onClose }) {
+    const [closing, setClosing] = React.useState(false);
+    const ref = React.useRef(null);
+
+    function dismiss() {
+      setClosing(true);
+      setTimeout(onClose, 150);
+    }
+
+    useEffect(() => {
+      function handleClick(e) {
+        if (ref.current && !ref.current.contains(e.target) && !anchorRef.current?.contains(e.target)) dismiss();
+      }
+      document.addEventListener('mousedown', handleClick);
+      return () => document.removeEventListener('mousedown', handleClick);
+    }, []);
+
+    const r = anchorRef.current?.getBoundingClientRect();
+    const style = r ? { position:'fixed', top: r.bottom + 8, right: window.innerWidth - r.right, zIndex: 9999 } : { display:'none' };
+
+    return ReactDOM.createPortal(
+      <div className={`user-menu ${closing ? 'anim-dropdown-out' : 'anim-dropdown'}`} ref={ref} style={style}>
+        <div className="user-menu-avatar">J</div>
+        <div className="user-menu-name">Jonathan Smith</div>
+        <div className="user-menu-email">jonathan_smith@qbo.com</div>
+        <div className="user-menu-divider"/>
+        <button className="user-menu-signout" onClick={() => { dismiss(); setTimeout(() => { window.location.href = 'LoginFlow.html?screen=choose'; }, 160); }}>Sign out</button>
+      </div>,
+      document.body
+    );
+  }
+
+  /* ── Column header with tooltip ─────────────────────────────────────── */
+  function ColHeader({ label, tooltip, skelClass }) {
+    const [show, setShow] = React.useState(false);
+    const [hiding, setHiding] = React.useState(false);
+    const hideTimer = React.useRef(null);
+    if (!tooltip) return <span className={skelClass||""}>{label}</span>;
+
+    function handleEnter() {
+      clearTimeout(hideTimer.current);
+      setHiding(false);
+      setShow(true);
+    }
+    function handleLeave() {
+      setHiding(true);
+      hideTimer.current = setTimeout(() => { setShow(false); setHiding(false); }, 120);
+    }
+
+    return (
+      <div className="th-tooltip-wrap" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+        <span className={skelClass||""}>{label}</span>
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style={{color:"var(--color-icon-secondary)",flexShrink:0}}>
+          <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
+          <path d="M8 7v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          <circle cx="8" cy="4.5" r="1" fill="currentColor"/>
+        </svg>
+        {show && (
+          <div className={`th-tooltip ${hiding ? 'th-tooltip-exit' : 'th-tooltip-enter'}`}>
+            <div className="th-tooltip-title">{label}</div>
+            {tooltip}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* ── Custom filter dropdown ──────────────────────────────────────── */
+  function FilterSelect({ options, value, onChange }) {
+    const [open, setOpen] = React.useState(false);
+    const [closing, setClosing] = React.useState(false);
+    const [menuStyle, setMenuStyle] = React.useState({});
+    const triggerRef = React.useRef(null);
+    const selected = options.find(o => o.value === value);
+
+    function openMenu() {
+      const r = triggerRef.current.getBoundingClientRect();
+      setMenuStyle({ position:'fixed', top: r.bottom + 4, left: r.left, minWidth: r.width, zIndex: 9999 });
+      setOpen(true);
+    }
+
+    function close() {
+      setClosing(true);
+      setTimeout(() => { setOpen(false); setClosing(false); }, 150);
+    }
+
+    useEffect(() => {
+      function handleClick(e) {
+        if (!triggerRef.current?.contains(e.target)) close();
+      }
+      if (open) document.addEventListener('mousedown', handleClick);
+      return () => document.removeEventListener('mousedown', handleClick);
+    }, [open]);
+
+    const menu = open && ReactDOM.createPortal(
+      <div className={`flt-menu ${closing ? 'flt-menu-exit' : 'flt-menu-enter'}`} style={menuStyle}>
+        {options.map(o => (
+          <button key={o.value} className={`flt-option${o.value===value?' selected':''}`}
+            onClick={() => { onChange(o.value); close(); }}>
+            <span>{o.label}</span>
+            {o.value === value && (
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8l3.5 3.5L13 5" stroke="var(--color-text-primary)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </button>
+        ))}
+      </div>,
+      document.body
+    );
+
+    return (
+      <div style={{position:'relative'}}>
+        <button ref={triggerRef} className={`flt-trigger${open?' open':''}`} onClick={() => open ? close() : openMenu()}>
+          <span>{selected?.label}</span>
+          <span style={{color:'var(--color-icon-secondary)',display:'flex',transition:'transform .2s',transform:open?'rotate(180deg)':'rotate(0deg)'}}>{Ico.chevDown(14)}</span>
+        </button>
+        {menu}
+      </div>
+    );
+  }
+
+  /* ── Loading screen ──────────────────────────────────────────────── */
+  const LOAD_STEPS = [
+    { label: "Connecting to your account",  delay: 350  },
+    { label: "Fetching company records",    delay: 800  },
+    { label: "Loading payment methods",     delay: 1250 },
+  ];
+  // Phase timeline (ms):
+  //   0        — screen mounts, icon rocks, title enters
+  //   350–1250 — pills stagger in
+  //   1800     — icon + title + pills all blur out together
+  //   2120     — welcome text blurs in (alone, clean)
+  //   4200     — full screen blurs out (welcome held for ~2s)
+  //   4820     — onDone fires
+
+  function LoadingScreen({ onDone }) {
+    const [visibleSteps, setVisibleSteps] = React.useState([]);
+    // phase: 'loading' | 'outro' | 'welcome' | 'exiting'
+    const [phase, setPhase] = React.useState('loading');
+
+    React.useEffect(() => {
+      const timers = LOAD_STEPS.map((step, i) =>
+        setTimeout(() => setVisibleSteps(p => [...p, i]), step.delay)
+      );
+      const outroTimer   = setTimeout(() => setPhase('outro'),   1800); // everything blurs out
+      const welcomeTimer = setTimeout(() => setPhase('welcome'), 2120); // welcome blurs in
+      const exitTimer    = setTimeout(() => setPhase('exiting'), 4200); // screen exits (~2s hold)
+      const doneTimer    = setTimeout(onDone,                    4820);
+      return () => {
+        timers.forEach(clearTimeout);
+        [outroTimer, welcomeTimer, exitTimer, doneTimer].forEach(clearTimeout);
+      };
+    }, []);
+
+    const showLoading = phase === 'loading' || phase === 'outro';
+    const showWelcome = phase === 'welcome' || phase === 'exiting';
+    const isOutro     = phase === 'outro';
+
+    return (
+      <div className={`loading-screen${phase === 'exiting' ? " exit" : ""}`}>
+        {/* Lucide asterisk icon — rocks back and forth, exits with everything else */}
+        {showLoading && (
+          <div className={`loading-icon${isOutro ? " exit" : ""}`}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="2"  x2="12" y2="22"/>
+              <line x1="4.93" y1="4.93"  x2="19.07" y2="19.07"/>
+              <line x1="2"  y1="12" x2="22" y2="12"/>
+              <line x1="4.93" y1="19.07" x2="19.07" y2="4.93"/>
+            </svg>
+          </div>
+        )}
+
+        {/* Loading title — exits with blur when outro begins */}
+        {showLoading && (
+          <div className={`loading-title${isOutro ? " exit" : ""}`}>
+            Loading your portal…
+          </div>
+        )}
+
+        {/* Welcome — character-by-character blur-in */}
+        {showWelcome && (
+          <div className="loading-welcome">
+            {"Welcome to your order portal, Jonathan".split("").map((ch, i) => (
+              <span key={i} className="loading-welcome-char" style={{animationDelay:`${i * 28}ms`}}>
+                {ch}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Pills — stagger out when outro begins */}
+        {showLoading && (
+          <div className="loading-pills">
+            {LOAD_STEPS.map((step, i) =>
+              visibleSteps.includes(i) && (
+                <div key={i} className={`loading-pill${isOutro ? " exit" : ""}`}
+                     style={{animationDelay: isOutro ? `${i * 45}ms` : '0ms'}}>
+                  {step.label}
+                </div>
+              )
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* ── App ─────────────────────────────────────────────────────────── */
+  function App() {
+    const [loading, setLoading] = React.useState(true);
+    const [entities, setEntities] = useState(INIT);
+    const [filter, setFilter] = useState("all");
+    const [search, setSearch] = useState("");
+    const [selIds, setSelIds] = useState(new Set());
+    const [page, setPage] = useState(1);
+    const [editTarget, setEditTarget] = useState(null);
+    const [bulkMode, setBulkMode] = useState(null);
+    const [toast, setToast] = useState(null);
+    const [showUserMenu, setShowUserMenu] = useState(false);
+    const gearRef = React.useRef(null);
+    const [updatedIds, setUpdatedIds] = useState(new Set());
+    const allDone = entities.every(isComplete);
+    const incomplete = entities.filter(e=>!isComplete(e)).length;
+    const [exitingCb, setExitingCb] = useState(false);
+    const prevAllDone = React.useRef(false);
+    useEffect(() => {
+      if (allDone && !prevAllDone.current) {
+        setExitingCb(true);
+        setTimeout(() => setExitingCb(false), 400);
+      }
+      prevAllDone.current = allDone;
+    }, [allDone]);
+
+    const filtered = entities.filter(e=>{
+      const mf = filter==="all"||(filter==="incomplete"&&!isComplete(e))||(filter==="complete"&&isComplete(e));
+      const ms = !search||e.companyName.toLowerCase().includes(search.toLowerCase());
+      return mf&&ms;
+    });
+    const totalPages = Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
+    const paginated = filtered.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
+    const allPageSel = paginated.length>0&&paginated.every(e=>selIds.has(e.id));
+    const someSel = selIds.size>0&&!allPageSel;
+
+    const toggleSel = id => setSelIds(p=>{ const n=new Set(p); n.has(id)?n.delete(id):n.add(id); return n; });
+    const toggleAll = () => allPageSel?setSelIds(new Set()):setSelIds(new Set(paginated.map(e=>e.id)));
+
+    function handleEdit(entity,tab){ setEditTarget({entity,tab:tab||"Company"}); }
+    function handleLinkClick(entity){ setEditTarget({entity,tab:"Linking"}); }
+
+    function flashRows(ids) {
+      setUpdatedIds(new Set(ids));
+      setTimeout(() => setUpdatedIds(new Set()), 2100);
+    }
+
+    function handleSave(updates){
+      const id = editTarget.entity.id;
+      setEntities(p=>p.map(e=>e.id===id?{...e,...updates}:e));
+      setToast(`Updated ${editTarget.entity.companyName}`);
+      setEditTarget(null);
+      flashRows([id]);
+    }
+
+    function handleResent(id){
+      setEntities(p=>p.map(e=>e.id===id?{...e,linkingStatus:"PENDING"}:e));
+      const name = entities.find(e=>e.id===id)?.companyName||"";
+      setToast(`Link request sent to ${name}`);
+      flashRows([id]);
+    }
+
+    function handleBulkSave(addr,pmt,activeTab){
+      const ids=selIds;
+      setEntities(p=>p.map(e=>!ids.has(e.id)?e:{...e,...(activeTab==="Company"?{address:addr}:{}),...(activeTab==="Payment"?{payment:pmt}:{})}));
+      setToast(`Updated ${ids.size} ${ids.size===1?"entity":"entities"}`);
+      setBulkMode(null); setSelIds(new Set());
+      flashRows([...ids]);
+    }
+
+    const selEntities = entities.filter(e=>selIds.has(e.id));
+
+    return (
+      <div style={{minHeight:"100vh"}}>
+
+        {loading && <LoadingScreen onDone={() => setLoading(false)} />}
+
+        {!loading && <>
+        {/* Topbar — lives on the navy background, outside the white card */}
+        <div className="topbar pg-enter pg-d0">
+          <span className="topbar-title"><span className="skel-wrap skel-d0">Order Portal</span></span>
+          {toast&&ReactDOM.createPortal(<div style={{position:"fixed",top:"8px",left:"50%",transform:"translateX(-50%)",zIndex:9999}}><div className="anim-toast"><Toast message={toast} onDone={()=>setToast(null)}/></div></div>,document.body)}
+          <div>
+            <button ref={gearRef} className="icon-btn" onClick={()=>{ if(!showUserMenu) setShowUserMenu(true); }}>{Ico.gear()}</button>
+            {showUserMenu && <UserMenu anchorRef={gearRef} onClose={()=>setShowUserMenu(false)}/>}
+          </div>
+        </div>
+
+        <div className="portal-card portal-card-enter" style={{animationDelay:"120ms"}}>
+          {/* Content */}
+          <div className="page-content" style={{position:"relative"}}>
+            <h1 className="page-heading pg-enter pg-d1">
+              <span className="skel-wrap skel-d1">{allDone?"Your order will be placed shortly.":"Review your companies and edit any missing data"}</span>
+            </h1>
+
+            {/* Status badge */}
+            {allDone && (
+              <div className="info-banner">
+                <span className="info-banner-icon">
+                  <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/></svg>
+                </span>
+                <span>All company information has been submitted. Your implementation consultant is reviewing the details and will reach out if they have any further questions.</span>
+              </div>
+            )}
+            <div className={`status-badge pg-enter pg-d2${allDone?" complete":""}`}>
+              {allDone
+                ? <><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8.5" stroke="currentColor" strokeWidth="1.5"/><path d="M6.5 10l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg><span>{entities.length}/{entities.length} companies ready</span></>
+                : <>{Ico.warn()}<span className="skel-wrap skel-d2">{incomplete}/{entities.length} companies incomplete</span></>}
+            </div>
+
+            {/* Toolbar */}
+            <div className="pg-enter pg-d3" style={{minHeight:52,marginBottom:16}}>
+              {selIds.size>0 ? (
+                <div>
+                  <div className="bulk-toolbar anim-slide-up">
+                    <span className="bulk-label">Bulk actions</span>
+                    <button className="bulk-btn" onClick={()=>setBulkMode("address")}>Edit address</button>
+                    <button className="bulk-btn" onClick={()=>setBulkMode("payment")}>Edit payment method</button>
+                    <button className="icon-btn" style={{color:"#859299",width:24,height:24}} onClick={()=>setSelIds(new Set())}>{Ico.x(14)}</button>
+                  </div>
+                  <div className="bulk-count">{selIds.size} {selIds.size===1?"entity":"entities"} selected</div>
+                </div>
+              ) : (
+                <div className="filter-bar">
+                  <div>
+                    <label className="filter-label">Filter</label>
+                    <FilterSelect
+                      value={filter}
+                      onChange={v=>{setFilter(v);setPage(1);}}
+                      options={[
+                        {value:'all',      label:'All companies'},
+                        {value:'incomplete',label:'Needs attention'},
+                        {value:'complete', label:'Complete'},
+                      ]}
+                    />
+                  </div>
+                  <div className="search-wrap">
+                    <span style={{color:"var(--color-icon-secondary)",display:"flex",flexShrink:0}}>{Ico.search()}</span>
+                    <input placeholder="Search" value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}}/>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Table */}
+            <div className="ids-table-container pg-enter pg-d4">
+              <table className="ids-table">
+                <thead>
+                  <tr>
+                    <th style={{width:44}} className={`col-cb${exitingCb?" collapsing":allDone?" collapsed":""}`}><div className="cb-inner"><CB checked={allPageSel} indeterminate={someSel} onChange={toggleAll}/></div></th>
+                    <th><span className="skel-wrap skel-d4">Company name</span></th>
+                    <th><ColHeader label="Address" tooltip="Make sure each company's legal name and address are correct. To update address info, go directly to QuickBooks Online." skelClass="skel-wrap skel-d4"/></th>
+                    <th><ColHeader label="Payment" tooltip={'Choose how each company pays. You can apply one payment method to multiple companies at once. "Original QBO payment" keeps the payment already on file in QuickBooks Online.'} skelClass="skel-wrap skel-d4"/></th>
+                    <th><ColHeader label="Linking status" tooltip="Linking syncs a company's QuickBooks Online account with your Enterprise Suite. It's a one-time step — it connects billing and data, but doesn't add users to the portal." skelClass="skel-wrap skel-d4"/></th>
+                    <th className="col-ready"><span className="skel-wrap skel-d4">Ready</span></th>
+                  </tr>
+                </thead>
+                <tbody className="ids-tbody-bordered">
+                  {paginated.length===0
+                    ? <tr><td colSpan={6} style={{textAlign:"center",padding:"48px 0",color:"var(--color-text-tertiary)"}}>No companies match your search.</td></tr>
+                    : paginated.map((e,i)=><ERow key={updatedIds.has(e.id)?`${e.id}-u`:e.id} entity={e} selected={selIds.has(e.id)} updated={updatedIds.has(e.id)} allDone={allDone} exitingCb={exitingCb} rowIndex={i} onToggle={()=>toggleSel(e.id)} onEdit={handleEdit} onLinkClick={handleLinkClick}/>)}
+                </tbody>
+              </table>
+              <div className="pagination">
+                <span>{(page-1)*PAGE_SIZE+1}–{Math.min(page*PAGE_SIZE,filtered.length)} of {filtered.length} items</span>
+                <div className="pg-controls">
+                  <span>Page</span>
+                  <span className="page-num">{page}</span>
+                  <span>of {totalPages}</span>
+                  <button className="pg-btn" onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1}>{Ico.chevLeft()}</button>
+                  <button className="pg-btn" onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page>=totalPages}>{Ico.chevRight()}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {editTarget&&<EditModal entity={editTarget.entity} initialTab={editTarget.tab} readOnly={allDone} onClose={()=>setEditTarget(null)} onSave={handleSave} onResent={handleResent}/>}
+        {bulkMode&&<BulkModal entities={selEntities} mode={bulkMode} onClose={()=>setBulkMode(null)} onSave={handleBulkSave}/>}
+        </>}
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
