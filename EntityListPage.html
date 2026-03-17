@@ -735,6 +735,177 @@
     .anim-overlay      { animation: _fadeIn   0.22s cubic-bezier(0.15, 0, 0.1, 1) both; }
     .anim-overlay-out  { animation: _fadeOut  0.22s cubic-bezier(0.4, 0, 1, 1)    both; }
     .anim-slide-up     { animation: _slideUp  0.24s cubic-bezier(0.15, 0, 0.1, 1) both; }
+
+    /* ── Welcome step modal ──────────────────────────────────────────── */
+    .step-modal { width: 520px; max-width: calc(100vw - 32px); }
+    .step-modal-eyebrow {
+      font-size: var(--fs-label); font-weight: var(--fw-bold);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--ies-teal); margin-bottom: var(--sp-6);
+    }
+    .step-modal-title {
+      font-size: 22px; font-weight: var(--fw-bold);
+      color: var(--color-text-primary); line-height: 1.25;
+      margin: 0 0 var(--sp-16) 0;
+    }
+    .step-modal-body {
+      font-size: var(--fs-body); color: var(--color-text-secondary);
+      line-height: 1.6; margin-bottom: var(--sp-16);
+    }
+    .step-modal-callout {
+      background: #f0f6ff; border-left: 3px solid var(--ies-link);
+      border-radius: 0 var(--r-badge) var(--r-badge) 0;
+      padding: var(--sp-12) var(--sp-16);
+      font-size: var(--fs-body-sm); color: var(--color-text-secondary);
+      line-height: 1.55; margin-bottom: var(--sp-4);
+    }
+    .step-modal-list {
+      margin: var(--sp-8) 0 var(--sp-4) 0; padding: 0;
+      list-style: none; display: flex; flex-direction: column; gap: var(--sp-8);
+    }
+    .step-modal-list li {
+      display: flex; gap: var(--sp-12); align-items: flex-start;
+      font-size: var(--fs-body); color: var(--color-text-secondary); line-height: 1.5;
+    }
+    .step-modal-list-num {
+      flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+      background: var(--ies-navy); color: white;
+      font-size: 11px; font-weight: var(--fw-bold);
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .step-modal-list li strong { color: var(--color-text-primary); font-weight: var(--fw-semibold); }
+
+    /* Timeline (step 4) */
+    .step-timeline { display: flex; flex-direction: column; gap: 0; margin-bottom: var(--sp-4); }
+    .step-timeline-item {
+      display: flex; gap: var(--sp-12); align-items: flex-start;
+      padding: var(--sp-12) 0; position: relative;
+    }
+    .step-timeline-item:not(:last-child)::after {
+      content: ''; position: absolute; left: 11px; top: 36px;
+      width: 2px; bottom: 0; background: var(--color-border-primary);
+    }
+    .step-timeline-dot {
+      flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+      border: 2px solid var(--color-border-secondary);
+      background: var(--color-bg-primary);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-timeline-label { font-size: var(--fs-body); font-weight: var(--fw-semibold); color: var(--color-text-primary); }
+    .step-timeline-sub { font-size: var(--fs-body-sm); color: var(--color-text-secondary); margin-top: 2px; line-height: 1.5; }
+
+    /* Step progress dots */
+    .step-progress {
+      display: flex; gap: 6px; align-items: center; margin-bottom: var(--sp-24);
+    }
+    .step-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--color-border-secondary); transition: background 0.2s, width 0.2s;
+    }
+    .step-dot.active { background: var(--ies-navy); width: 20px; border-radius: 4px; }
+    .step-dot.done   { background: var(--ies-teal); }
+
+    /* Step modal footer */
+    .step-modal-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--sp-16) var(--sp-24);
+      border-top: 1.5px solid var(--color-border-primary);
+    }
+    .btn-ghost {
+      height: 40px; padding: 0 var(--sp-16);
+      background: transparent; color: var(--color-text-secondary);
+      border: none; border-radius: var(--r-btn);
+      font-size: var(--fs-body); font-family: var(--font);
+      font-weight: var(--fw-semibold); cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .btn-ghost:hover { background: var(--color-bg-tertiary); color: var(--color-text-primary); }
+    .step-modal-actions { display: flex; gap: var(--sp-8); align-items: center; }
+    .btn-primary-md {
+      height: 40px; padding: 0 var(--sp-24);
+      background: var(--ies-navy); color: white;
+      border: none; border-radius: var(--r-btn);
+      font-size: var(--fs-body); font-family: var(--font);
+      font-weight: var(--fw-bold); cursor: pointer;
+      transition: background .15s; white-space: nowrap;
+    }
+    .btn-primary-md:hover { background: var(--ies-navy-hover); }
+
+    /* ── Pre-lock modal ───────────────────────────────────────────────── */
+    .prelock-modal { width: 540px; max-width: calc(100vw - 32px); }
+    .prelock-eyebrow {
+      font-size: var(--fs-label); font-weight: var(--fw-bold);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--ies-teal); margin-bottom: var(--sp-6);
+    }
+    .prelock-title {
+      font-size: 20px; font-weight: var(--fw-bold);
+      color: var(--color-text-primary); margin: 0 0 var(--sp-4) 0;
+    }
+    .prelock-subtitle {
+      font-size: var(--fs-body); color: var(--color-text-secondary);
+      margin-bottom: var(--sp-20);
+    }
+    .prelock-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: var(--sp-12); margin-bottom: var(--sp-20);
+    }
+    .prelock-grid-cell {
+      background: var(--color-bg-secondary);
+      border: 1.5px solid var(--color-border-primary);
+      border-radius: var(--r-badge); padding: var(--sp-12) var(--sp-16);
+    }
+    .prelock-grid-label { font-size: var(--fs-label); color: var(--color-text-tertiary); font-weight: var(--fw-medium); margin-bottom: 3px; }
+    .prelock-grid-value { font-size: var(--fs-body); font-weight: var(--fw-semibold); color: var(--color-text-primary); }
+    .prelock-grid-sub { font-size: var(--fs-label); color: var(--color-text-tertiary); margin-top: 2px; }
+    .prelock-section-title {
+      font-size: var(--fs-body); font-weight: var(--fw-bold);
+      color: var(--color-text-primary); margin-bottom: var(--sp-12);
+    }
+    .prelock-timeline { display: flex; flex-direction: column; gap: 0; margin-bottom: var(--sp-16); }
+    .prelock-timeline-item {
+      display: flex; gap: var(--sp-12); align-items: flex-start;
+      padding: 10px 0; position: relative;
+    }
+    .prelock-timeline-item:not(:last-child)::after {
+      content: ''; position: absolute; left: 11px; top: 34px;
+      width: 2px; bottom: 0; background: var(--color-border-primary);
+    }
+    .prelock-timeline-dot {
+      flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+      border: 2px solid var(--color-border-secondary);
+      background: var(--color-bg-primary);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .prelock-timeline-dot.done {
+      background: var(--ies-teal); border-color: var(--ies-teal);
+    }
+    .prelock-timeline-text { font-size: var(--fs-body); color: var(--color-text-secondary); line-height: 1.5; }
+    .prelock-timeline-text strong { color: var(--color-text-primary); font-weight: var(--fw-semibold); }
+    .prelock-callout {
+      background: #f0f6ff; border-left: 3px solid var(--ies-link);
+      border-radius: 0 var(--r-badge) var(--r-badge) 0;
+      padding: var(--sp-12) var(--sp-16);
+      font-size: var(--fs-body-sm); color: var(--color-text-secondary);
+      line-height: 1.55; margin-bottom: var(--sp-16);
+    }
+    .prelock-ic-row {
+      display: flex; align-items: center; gap: var(--sp-12);
+      padding: var(--sp-12) var(--sp-16);
+      background: var(--color-bg-secondary);
+      border: 1.5px solid var(--color-border-primary);
+      border-radius: var(--r-badge);
+    }
+    .prelock-ic-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--ies-navy); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: var(--fw-bold); flex-shrink: 0;
+    }
+    .prelock-ic-name { font-size: var(--fs-body); font-weight: var(--fw-semibold); color: var(--color-text-primary); }
+    .prelock-ic-role { font-size: var(--fs-label); color: var(--color-text-tertiary); }
+    .prelock-ic-email { font-size: var(--fs-label); color: var(--ies-link); margin-top: 1px; }
     .anim-dropdown     { animation: _slideUp    0.2s  cubic-bezier(0.15, 0, 0.1, 1) both; }
     .anim-dropdown-out { animation: _slideDown  0.15s cubic-bezier(0.4, 0, 1, 1)   both; }
   </style>
@@ -1687,9 +1858,198 @@
     );
   }
 
+  /* ── IC / portal constants ───────────────────────────────────────── */
+  const IC = { name: "Sarah Chen", role: "Implementation Consultant", email: "sarah.chen@ies.com", initials: "SC" };
+  const CONTRACT = { number: "IES-2026-04821", signed: "March 3, 2026" };
+
+  /* ── Welcome step modal ──────────────────────────────────────────── */
+  function WelcomeModal({ entityCount, onDone }) {
+    const [step, setStep] = React.useState(0);
+    const [closing, setClosing] = React.useState(false);
+    const TOTAL = 4;
+
+    function dismiss() {
+      setClosing(true);
+      setTimeout(() => { localStorage.setItem('ies_welcome_seen', '1'); onDone(); }, 220);
+    }
+
+    const steps = [
+      // Step 1
+      <div key="s1">
+        <div className="step-modal-eyebrow">Welcome to IES</div>
+        <h2 className="step-modal-title">You're almost there</h2>
+        <div className="step-modal-body">
+          You've signed your IES contract — now we're helping us confirm a few details so we can place your order. This portal is your workspace for completing everything in one place. It typically takes less than 15 minutes if you have your payment info handy.
+        </div>
+        <div className="step-modal-callout">
+          Your Implementation Consultant is standing by. If anything's unclear, use the help button at any time to reach them directly.
+        </div>
+      </div>,
+
+      // Step 2
+      <div key="s2">
+        <h2 className="step-modal-title">Here's what you'll need to complete</h2>
+        <div className="step-modal-body">
+          Your order includes <strong>{entityCount} companies</strong>. For each one, you may need to provide:
+        </div>
+        <ol className="step-modal-list">
+          <li><span className="step-modal-list-num">1</span><span><strong>Company details</strong> — verify or update the name and address for each entity</span></li>
+          <li><span className="step-modal-list-num">2</span><span><strong>Payment method</strong> — add a card or bank account, or confirm your existing QuickBooks payment</span></li>
+          <li><span className="step-modal-list-num">3</span><span><strong>Account linking</strong> — connect child companies to your parent account so billing and access work correctly</span></li>
+        </ol>
+      </div>,
+
+      // Step 3
+      <div key="s3">
+        <h2 className="step-modal-title">A note on account linking</h2>
+        <div className="step-modal-body">
+          Linking connects your child companies to the parent account. We'll send each company's admin an email invite — they'll need to accept it before that company shows as ready. We recommend sending invites first, since they can take a day or two to complete while you finish the rest.
+        </div>
+        <div className="step-modal-callout">
+          Already done this before? Your existing QuickBooks accounts may already be linked. Check the Linking status column — anything showing 'Linked' is good to go.
+        </div>
+      </div>,
+
+      // Step 4
+      <div key="s4">
+        <h2 className="step-modal-title">What happens when you're done</h2>
+        <div className="step-modal-body">
+          Once all companies show a Ready status, your order information will automatically be sent to our team for review. Here's what follows:
+        </div>
+        <div className="step-timeline">
+          {[
+            { label: "Your order is submitted", sub: "Your portal locks and your order goes to our team for a final check." },
+            { label: "We review", sub: "Your Order Admin reviews the details, usually within a few hours. If anything needs clarification, your IC will reach out." },
+            { label: "Order placed", sub: "Your IES setup begins. Your IC will be in touch with next steps." },
+          ].map((item, i) => (
+            <div className="step-timeline-item" key={i}>
+              <div className="step-timeline-dot"/>
+              <div>
+                <div className="step-timeline-label">{item.label}</div>
+                <div className="step-timeline-sub">{item.sub}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>,
+    ];
+
+    return (
+      <div className={`modal-overlay${closing ? ' anim-overlay-out' : ' anim-overlay'}`}>
+        <div className={`modal step-modal${closing ? ' anim-modal-out' : ' anim-modal'}`}>
+          <div className="modal-body" style={{paddingBottom: 0}}>
+            <div className="step-progress">
+              {Array.from({length: TOTAL}).map((_,i) => (
+                <div key={i} className={`step-dot${i === step ? ' active' : i < step ? ' done' : ''}`}/>
+              ))}
+            </div>
+            <div className="anim-slide-up" key={step}>
+              {steps[step]}
+            </div>
+          </div>
+          <div className="step-modal-footer">
+            <button className="btn-ghost" onClick={dismiss}>Skip intro</button>
+            <div className="step-modal-actions">
+              {step > 0 && <button className="btn-ghost" onClick={() => setStep(s => s-1)}>Back</button>}
+              {step < TOTAL - 1
+                ? <button className="btn-primary-md" onClick={() => setStep(s => s+1)}>Next</button>
+                : <button className="btn-primary-md" onClick={dismiss}>Let's go →</button>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Pre-lock modal ───────────────────────────────────────────────── */
+  function PreLockModal({ entities, onDone }) {
+    const [closing, setClosing] = React.useState(false);
+    const total = entities.length;
+    const linked = entities.filter(e => e.linkingStatus === 'LINKED').length;
+    const remaining = total - linked;
+
+    function dismiss() {
+      setClosing(true);
+      setTimeout(onDone, 220);
+    }
+
+    return (
+      <div className={`modal-overlay${closing ? ' anim-overlay-out' : ' anim-overlay'}`}>
+        <div className={`modal prelock-modal${closing ? ' anim-modal-out' : ' anim-modal'}`}>
+          <div className="modal-body">
+            <div className="prelock-eyebrow">Order received</div>
+            <h2 className="prelock-title">Your information is complete</h2>
+            <p className="prelock-subtitle">We've sent your order details to your team for a final review.</p>
+
+            <div className="prelock-grid">
+              <div className="prelock-grid-cell">
+                <div className="prelock-grid-label">Companies</div>
+                <div className="prelock-grid-value">{total} of {total} ready</div>
+                <div className="prelock-grid-sub">Address &amp; payment complete</div>
+              </div>
+              <div className="prelock-grid-cell">
+                <div className="prelock-grid-label">Account linking</div>
+                <div className="prelock-grid-value">{linked} of {total} linked</div>
+                <div className="prelock-grid-sub">{remaining > 0 ? `Invites sent to remaining ${remaining}` : 'All companies linked'}</div>
+              </div>
+              <div className="prelock-grid-cell">
+                <div className="prelock-grid-label">Contract</div>
+                <div className="prelock-grid-value">{CONTRACT.number}</div>
+                <div className="prelock-grid-sub">Signed {CONTRACT.signed}</div>
+              </div>
+              <div className="prelock-grid-cell">
+                <div className="prelock-grid-label">Your contact</div>
+                <div className="prelock-grid-value">{IC.name}</div>
+                <div className="prelock-grid-sub">{IC.role}</div>
+              </div>
+            </div>
+
+            <div className="prelock-section-title">What's happening now</div>
+            <div className="prelock-timeline">
+              {[
+                { done: true,  label: "Your portal is now locked", sub: "You can still view everything you entered, but editing is paused while we review." },
+                { done: false, label: "Our team does a final check", sub: "Usually within a few hours. If anything needs clarification, your IC will reach out." },
+                { done: false, label: "Your IES setup begins", sub: "Once your order is placed, you'll hear from your Implementation Consultant with next steps." },
+              ].map((item, i) => (
+                <div className="prelock-timeline-item" key={i}>
+                  <div className={`prelock-timeline-dot${item.done ? ' done' : ''}`}>
+                    {item.done && Ico.check('white', 11)}
+                  </div>
+                  <div className="prelock-timeline-text">
+                    <strong>{item.label}</strong> — {item.sub}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="prelock-callout">
+              Account linking can still complete in the background. Any admins who haven't accepted their invite yet can still do so — this won't hold up your order.
+            </div>
+
+            <div className="prelock-ic-row">
+              <div className="prelock-ic-avatar">{IC.initials}</div>
+              <div>
+                <div className="prelock-ic-name">{IC.name}</div>
+                <div className="prelock-ic-role">{IC.role}</div>
+                <div className="prelock-ic-email">{IC.email}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-footer" style={{borderTop:'1.5px solid var(--color-border-primary)'}}>
+            <button className="btn-primary" onClick={dismiss}>View my order →</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   /* ── App ─────────────────────────────────────────────────────────── */
   function App() {
     const [loading, setLoading] = React.useState(true);
+    const [showWelcome, setShowWelcome] = React.useState(!localStorage.getItem('ies_welcome_seen'));
+    const [showPreLock, setShowPreLock] = React.useState(false);
     const [entities, setEntities] = useState(INIT);
     const [filter, setFilter] = useState("all");
     const [search, setSearch] = useState("");
@@ -1709,6 +2069,10 @@
       if (allDone && !prevAllDone.current) {
         setExitingCb(true);
         setTimeout(() => setExitingCb(false), 400);
+        // Show pre-lock modal exactly once when all entities become ready
+        if (!localStorage.getItem('ies_prelock_seen')) {
+          setShowPreLock(true);
+        }
       }
       prevAllDone.current = allDone;
     }, [allDone]);
@@ -1866,6 +2230,8 @@
 
         {editTarget&&<EditModal entity={editTarget.entity} initialTab={editTarget.tab} readOnly={allDone} onClose={()=>setEditTarget(null)} onSave={handleSave} onResent={handleResent}/>}
         {bulkMode&&<BulkModal entities={selEntities} mode={bulkMode} onClose={()=>setBulkMode(null)} onSave={handleBulkSave}/>}
+        {showWelcome&&<WelcomeModal entityCount={entities.length} onDone={()=>setShowWelcome(false)}/>}
+        {showPreLock&&<PreLockModal entities={entities} onDone={()=>{ localStorage.setItem('ies_prelock_seen','1'); setShowPreLock(false); }}/>}
         </>}
       </div>
     );
