@@ -845,79 +845,86 @@
     .btn-step-next:hover { background: var(--ies-navy-hover); }
 
     /* ── Pre-lock modal ───────────────────────────────────────────────── */
-    .prelock-modal { width: 540px; max-width: calc(100vw - 32px); }
-    .prelock-eyebrow {
-      font-size: var(--fs-label); font-weight: var(--fw-bold);
-      text-transform: uppercase; letter-spacing: 0.07em;
-      color: var(--ies-teal); margin-bottom: var(--sp-6);
+    .prelock-modal { width: 560px; max-width: calc(100vw - 32px); }
+
+    /* Top icon circle */
+    .prelock-icon-circle {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: #e8f0fe;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto var(--sp-20);
     }
+
+    /* Headings — match Figma H4/H5 */
     .prelock-title {
-      font-size: 20px; font-weight: var(--fw-bold);
-      color: var(--color-text-primary); margin: 0 0 var(--sp-4) 0;
+      font-size: 22px; font-weight: var(--fw-semibold);
+      color: var(--color-text-primary); line-height: 1.3;
+      margin: 0 0 var(--sp-8) 0;
     }
     .prelock-subtitle {
+      font-size: 18px; font-weight: var(--fw-semibold);
+      color: var(--color-text-secondary); line-height: 1.3;
+      margin: 0 0 var(--sp-16) 0;
+    }
+    .prelock-body-text {
       font-size: var(--fs-body); color: var(--color-text-secondary);
-      margin-bottom: var(--sp-20);
+      line-height: 1.5; margin-bottom: var(--sp-20);
     }
-    .prelock-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: var(--sp-12); margin-bottom: var(--sp-20);
-    }
-    .prelock-grid-cell {
-      background: var(--color-bg-secondary);
-      border: 1.5px solid var(--color-border-primary);
-      border-radius: var(--r-badge); padding: var(--sp-12) var(--sp-16);
-    }
-    .prelock-grid-label { font-size: var(--fs-label); color: var(--color-text-tertiary); font-weight: var(--fw-medium); margin-bottom: 3px; }
-    .prelock-grid-value { font-size: var(--fs-body); font-weight: var(--fw-semibold); color: var(--color-text-primary); }
-    .prelock-grid-sub { font-size: var(--fs-label); color: var(--color-text-tertiary); margin-top: 2px; }
+
+    /* "What's happening now" section */
     .prelock-section-title {
-      font-size: var(--fs-body); font-weight: var(--fw-bold);
-      color: var(--color-text-primary); margin-bottom: var(--sp-12);
+      font-size: var(--fs-body); font-weight: var(--fw-semibold);
+      color: var(--color-text-primary); margin-bottom: var(--sp-16);
     }
-    .prelock-timeline { display: flex; flex-direction: column; gap: 0; margin-bottom: var(--sp-16); }
+    .prelock-timeline { display: flex; flex-direction: column; margin-bottom: var(--sp-16); }
     .prelock-timeline-item {
-      display: flex; gap: var(--sp-12); align-items: flex-start;
-      padding: 10px 0; position: relative;
-    }
-    .prelock-timeline-item:not(:last-child)::after {
-      content: ''; position: absolute; left: 11px; top: 34px;
-      width: 2px; bottom: 0; background: var(--color-border-primary);
+      display: flex; gap: var(--sp-8); align-items: flex-start;
+      padding: var(--sp-8) 0;
     }
     .prelock-timeline-dot {
       flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
-      border: 2px solid var(--color-border-secondary);
+      border: 1.5px solid var(--color-border-secondary);
       background: var(--color-bg-primary);
-      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
     }
+    /* Filled navy circle-check for the completed step */
     .prelock-timeline-dot.done {
-      background: var(--ies-teal); border-color: var(--ies-teal);
-    }
-    .prelock-timeline-text { font-size: var(--fs-body); color: var(--color-text-secondary); line-height: 1.5; }
-    .prelock-timeline-text strong { color: var(--color-text-primary); font-weight: var(--fw-semibold); }
-    .prelock-callout {
-      background: #f0f6ff; border-left: 3px solid var(--ies-link);
-      border-radius: 0 var(--r-badge) var(--r-badge) 0;
-      padding: var(--sp-12) var(--sp-16);
-      font-size: var(--fs-body-sm); color: var(--color-text-secondary);
-      line-height: 1.55; margin-bottom: var(--sp-16);
-    }
-    .prelock-ic-row {
-      display: flex; align-items: center; gap: var(--sp-12);
-      padding: var(--sp-12) var(--sp-16);
-      background: var(--color-bg-secondary);
-      border: 1.5px solid var(--color-border-primary);
-      border-radius: var(--r-badge);
-    }
-    .prelock-ic-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: var(--ies-navy); color: white;
+      background: var(--ies-navy); border-color: var(--ies-navy);
       display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: var(--fw-bold); flex-shrink: 0;
     }
-    .prelock-ic-name { font-size: var(--fs-body); font-weight: var(--fw-semibold); color: var(--color-text-primary); }
-    .prelock-ic-role { font-size: var(--fs-label); color: var(--color-text-tertiary); }
-    .prelock-ic-email { font-size: var(--fs-label); color: var(--ies-link); margin-top: 1px; }
+    .prelock-timeline-label {
+      font-size: var(--fs-body); font-weight: var(--fw-semibold);
+      color: var(--color-text-primary); line-height: 1.4;
+    }
+    .prelock-timeline-sub {
+      font-size: var(--fs-body); color: var(--color-text-secondary);
+      line-height: 1.5; margin-top: 2px;
+    }
+
+    /* Info callout — full border box with info badge icon */
+    .prelock-callout {
+      display: flex; gap: var(--sp-8); align-items: flex-start;
+      background: white;
+      border: 1.5px solid var(--ies-link-hover);
+      border-radius: var(--r-badge);
+      padding: var(--sp-16);
+      margin-bottom: var(--sp-16);
+    }
+    .prelock-callout-icon {
+      flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--ies-link); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: var(--fw-bold);
+      margin-top: 1px;
+    }
+    .prelock-callout-text {
+      font-size: var(--fs-body); color: var(--color-text-secondary); line-height: 1.5;
+    }
+
+    /* Full-width footer button */
+    .prelock-footer {
+      padding: 0 var(--sp-40) var(--sp-32);
+    }
     .anim-dropdown     { animation: _slideUp    0.2s  cubic-bezier(0.15, 0, 0.1, 1) both; }
     .anim-dropdown-out { animation: _slideDown  0.15s cubic-bezier(0.4, 0, 1, 1)   both; }
   </style>
@@ -1882,7 +1889,7 @@
 
     function dismiss() {
       setClosing(true);
-      setTimeout(() => { localStorage.setItem('ies_welcome_seen', '1'); onDone(); }, 220);
+      setTimeout(() => { sessionStorage.setItem('ies_welcome_seen', '1'); onDone(); }, 220);
     }
 
     const steps = [
@@ -1986,80 +1993,62 @@
   /* ── Pre-lock modal ───────────────────────────────────────────────── */
   function PreLockModal({ entities, onDone }) {
     const [closing, setClosing] = React.useState(false);
-    const total = entities.length;
-    const linked = entities.filter(e => e.linkingStatus === 'LINKED').length;
-    const remaining = total - linked;
 
     function dismiss() {
       setClosing(true);
       setTimeout(onDone, 220);
     }
 
+    const TIMELINE = [
+      { done: true,  label: "Your portal is now locked",    sub: "You can still view everything you entered, but editing is paused while we review." },
+      { done: false, label: "Our team does a final check",  sub: "Usually within a few hours. If anything needs clarification, your IC will reach out." },
+      { done: false, label: "Your IES setup begins",        sub: "Once your order is placed, you'll hear from your Implementation Consultant with next steps" },
+    ];
+
     return (
       <div className={`modal-overlay${closing ? ' anim-overlay-out' : ' anim-overlay'}`}>
-        <div className={`modal prelock-modal${closing ? ' anim-modal-out' : ' anim-modal'}`}>
-          <div className="modal-body">
-            <div className="prelock-eyebrow">Order received</div>
-            <h2 className="prelock-title">Your information is complete</h2>
-            <p className="prelock-subtitle">We've sent your order details to your team for a final review.</p>
+        <div className={`modal prelock-modal${closing ? ' anim-modal-out' : ' anim-modal'}`} style={{position:'relative'}}>
+          {/* Close X */}
+          <button className="step-modal-close" onClick={dismiss} aria-label="Close">{Ico.x(16)}</button>
 
-            <div className="prelock-grid">
-              <div className="prelock-grid-cell">
-                <div className="prelock-grid-label">Companies</div>
-                <div className="prelock-grid-value">{total} of {total} ready</div>
-                <div className="prelock-grid-sub">Address &amp; payment complete</div>
-              </div>
-              <div className="prelock-grid-cell">
-                <div className="prelock-grid-label">Account linking</div>
-                <div className="prelock-grid-value">{linked} of {total} linked</div>
-                <div className="prelock-grid-sub">{remaining > 0 ? `Invites sent to remaining ${remaining}` : 'All companies linked'}</div>
-              </div>
-              <div className="prelock-grid-cell">
-                <div className="prelock-grid-label">Contract</div>
-                <div className="prelock-grid-value">{CONTRACT.number}</div>
-                <div className="prelock-grid-sub">Signed {CONTRACT.signed}</div>
-              </div>
-              <div className="prelock-grid-cell">
-                <div className="prelock-grid-label">Your contact</div>
-                <div className="prelock-grid-value">{IC.name}</div>
-                <div className="prelock-grid-sub">{IC.role}</div>
-              </div>
+          <div className="modal-body" style={{padding:'var(--sp-32) var(--sp-40) var(--sp-16)'}}>
+            {/* Checkmark icon circle */}
+            <div className="prelock-icon-circle">
+              {Ico.check('#17497f', 20)}
             </div>
 
+            {/* Title + subtitle */}
+            <h2 className="prelock-title">Your information is complete</h2>
+            <h3 className="prelock-subtitle">We've sent your order details to your team for a final review.</h3>
+
+            {/* "What's happening now" */}
             <div className="prelock-section-title">What's happening now</div>
             <div className="prelock-timeline">
-              {[
-                { done: true,  label: "Your portal is now locked", sub: "You can still view everything you entered, but editing is paused while we review." },
-                { done: false, label: "Our team does a final check", sub: "Usually within a few hours. If anything needs clarification, your IC will reach out." },
-                { done: false, label: "Your IES setup begins", sub: "Once your order is placed, you'll hear from your Implementation Consultant with next steps." },
-              ].map((item, i) => (
+              {TIMELINE.map((item, i) => (
                 <div className="prelock-timeline-item" key={i}>
                   <div className={`prelock-timeline-dot${item.done ? ' done' : ''}`}>
                     {item.done && Ico.check('white', 11)}
                   </div>
-                  <div className="prelock-timeline-text">
-                    <strong>{item.label}</strong> — {item.sub}
+                  <div>
+                    <div className="prelock-timeline-label">{item.label}</div>
+                    <div className="prelock-timeline-sub">{item.sub}</div>
                   </div>
                 </div>
               ))}
             </div>
 
+            {/* Info callout — full border, info badge */}
             <div className="prelock-callout">
-              Account linking can still complete in the background. Any admins who haven't accepted their invite yet can still do so — this won't hold up your order.
-            </div>
-
-            <div className="prelock-ic-row">
-              <div className="prelock-ic-avatar">{IC.initials}</div>
-              <div>
-                <div className="prelock-ic-name">{IC.name}</div>
-                <div className="prelock-ic-role">{IC.role}</div>
-                <div className="prelock-ic-email">{IC.email}</div>
+              <div className="prelock-callout-icon">i</div>
+              <div className="prelock-callout-text">
+                Account linking can still complete in the background. Any admins who haven't accepted their invite yet can still do so. This won't hold up your order.
               </div>
             </div>
           </div>
 
-          <div className="modal-footer" style={{borderTop:'1.5px solid var(--color-border-primary)'}}>
-            <button className="btn-primary" onClick={dismiss}>View my order →</button>
+          {/* Full-width CTA */}
+          <div className="prelock-footer">
+            <button className="btn-primary" onClick={dismiss}>View my order</button>
           </div>
         </div>
       </div>
@@ -2069,7 +2058,7 @@
   /* ── App ─────────────────────────────────────────────────────────── */
   function App() {
     const [loading, setLoading] = React.useState(true);
-    const [showWelcome, setShowWelcome] = React.useState(!localStorage.getItem('ies_welcome_seen'));
+    const [showWelcome, setShowWelcome] = React.useState(!sessionStorage.getItem('ies_welcome_seen'));
     const [showPreLock, setShowPreLock] = React.useState(false);
     const [entities, setEntities] = useState(INIT);
     const [filter, setFilter] = useState("all");
@@ -2091,7 +2080,7 @@
         setExitingCb(true);
         setTimeout(() => setExitingCb(false), 400);
         // Show pre-lock modal exactly once when all entities become ready
-        if (!localStorage.getItem('ies_prelock_seen')) {
+        if (!sessionStorage.getItem('ies_prelock_seen')) {
           setShowPreLock(true);
         }
       }
@@ -2252,7 +2241,7 @@
         {editTarget&&<EditModal entity={editTarget.entity} initialTab={editTarget.tab} readOnly={allDone} onClose={()=>setEditTarget(null)} onSave={handleSave} onResent={handleResent}/>}
         {bulkMode&&<BulkModal entities={selEntities} mode={bulkMode} onClose={()=>setBulkMode(null)} onSave={handleBulkSave}/>}
         {showWelcome&&<WelcomeModal entityCount={entities.length} onDone={()=>setShowWelcome(false)}/>}
-        {showPreLock&&<PreLockModal entities={entities} onDone={()=>{ localStorage.setItem('ies_prelock_seen','1'); setShowPreLock(false); }}/>}
+        {showPreLock&&<PreLockModal entities={entities} onDone={()=>{ sessionStorage.setItem('ies_prelock_seen','1'); setShowPreLock(false); }}/>}
         </>}
       </div>
     );
