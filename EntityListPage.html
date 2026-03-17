@@ -1464,13 +1464,13 @@
               : <button className="cell-add" onClick={()=>onEdit(entity,"Payment")}>{Ico.plus(12)}Add</button>}
           </div>
         </td>
-        <td><LSBadge status={entity.linkingStatus} onClick={()=>onLinkClick(entity)} skelClass={sd}/></td>
         <td className="col-ready">
           {done
             ? <span className="ready-on">{Ico.check("white",12)}</span>
             : <span className="ready-off">{Ico.check("var(--color-border-primary)",12)}</span>
           }
         </td>
+        <td><LSBadge status={entity.linkingStatus} onClick={()=>onLinkClick(entity)} skelClass={sd}/></td>
       </tr>
     );
   }
@@ -1840,8 +1840,8 @@
                     <th><span className="skel-wrap skel-d4">Company name</span></th>
                     <th><ColHeader label="Address" tooltip="Make sure each company's legal name and address are correct. To update address info, go directly to QuickBooks Online." skelClass="skel-wrap skel-d4"/></th>
                     <th><ColHeader label="Payment" tooltip={'Choose how each company pays. You can apply one payment method to multiple companies at once. "Original QBO payment" keeps the payment already on file in QuickBooks Online.'} skelClass="skel-wrap skel-d4"/></th>
-                    <th><ColHeader label="Linking status" tooltip="Linking syncs a company's QuickBooks Online account with your Enterprise Suite. It's a one-time step — it connects billing and data, but doesn't add users to the portal." skelClass="skel-wrap skel-d4"/></th>
                     <th className="col-ready"><span className="skel-wrap skel-d4">Ready</span></th>
+                    <th><ColHeader label="Linking status" tooltip="Linking syncs a company's QuickBooks Online account with your Enterprise Suite. It's a one-time step — it connects billing and data, but doesn't add users to the portal." skelClass="skel-wrap skel-d4"/></th>
                   </tr>
                 </thead>
                 <tbody className="ids-tbody-bordered">
